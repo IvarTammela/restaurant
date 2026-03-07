@@ -1,10 +1,11 @@
 import type { CSSProperties } from 'react';
-import type { RestaurantTable, TableRecommendation, Reservation } from '../types';
+import type { RestaurantTable, TableRecommendation, Reservation, FloorElement } from '../types';
 
 interface Props {
   tables: RestaurantTable[];
   recommendations: TableRecommendation[];
   reservations: Reservation[];
+  floorElements: FloorElement[];
   selectedTable: RestaurantTable | null;
   filterDate: string;
   filterTime: string;
@@ -25,6 +26,7 @@ export default function FloorPlan({
   tables,
   recommendations,
   reservations,
+  floorElements,
   selectedTable,
   filterDate,
   filterTime,
@@ -102,9 +104,9 @@ export default function FloorPlan({
   }
 
   const zoneRegions = [
-    { zone: 'MAIN_HALL', label: 'Sisesaal', x: 0, y: 0, w: 55, h: 70 },
-    { zone: 'TERRACE', label: 'Terrass', x: 57, y: 0, w: 43, h: 60 },
-    { zone: 'PRIVATE_ROOM', label: 'Privaatruumid', x: 0, y: 65, w: 60, h: 35 },
+    { zone: 'MAIN_HALL', label: 'Sisesaal', x: 0, y: 0, w: 52, h: 72 },
+    { zone: 'TERRACE', label: 'Terrass', x: 54, y: 0, w: 46, h: 72 },
+    { zone: 'PRIVATE_ROOM', label: 'Privaatruumid', x: 0, y: 74, w: 100, h: 26 },
   ];
 
   return (
@@ -167,12 +169,23 @@ export default function FloorPlan({
           </svg>
         )}
 
-        {/* Static restaurant elements */}
-        <div className="floor-element stage">&#127925; LAVA</div>
-        <div className="floor-element bar">BAAR</div>
-        <div className="floor-element kitchen">KOKK</div>
-        <div className="floor-element playground">&#x1F9F8;</div>
-        <div className="floor-element door">&#x2191;</div>
+        {/* Static restaurant elements from backend */}
+        {floorElements.map((elem) => (
+          <div
+            key={elem.id}
+            className={`floor-element ${elem.type}`}
+            style={{
+              left: `${elem.posX}%`,
+              top: `${elem.posY}%`,
+              width: `${elem.width}%`,
+              height: `${elem.height}%`,
+              transform: elem.rotation ? `rotate(${elem.rotation}deg)` : undefined,
+              position: 'absolute',
+            }}
+          >
+            {elem.name}
+          </div>
+        ))}
 
         {/* Tables */}
         {tables.map((table) => {

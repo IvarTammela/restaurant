@@ -30,6 +30,17 @@ export interface TableRecommendation {
   combinedWith?: RestaurantTable;
 }
 
+export interface FloorElement {
+  id: number;
+  type: string;
+  name: string;
+  posX: number;
+  posY: number;
+  width: number;
+  height: number;
+  rotation: number;
+}
+
 export interface Filters {
   date: string;
   time: string;

@@ -13,6 +13,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByDate(LocalDate date);
 
+    void deleteByTableId(Long tableId);
+
     @Query("SELECT r FROM Reservation r WHERE r.date = :date " +
            "AND r.startTime < :endTime AND r.endTime > :startTime")
     List<Reservation> findOverlapping(@Param("date") LocalDate date,
