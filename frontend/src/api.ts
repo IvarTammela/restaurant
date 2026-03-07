@@ -16,6 +16,7 @@ export async function fetchRecommendations(filters: Filters): Promise<TableRecom
     privateArea: String(filters.privateArea),
     nearPlayground: String(filters.nearPlayground),
     accessible: String(filters.accessible),
+    nearStage: String(filters.nearStage),
   });
   if (filters.zone) params.set('zone', filters.zone);
 

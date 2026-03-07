@@ -39,9 +39,13 @@ public class DataInitializer implements CommandLineRunner {
         tableRepository.save(new RestaurantTable(6, 6, 25, 40, Zone.MAIN_HALL, false, false, false, true));
         tableRepository.save(new RestaurantTable(7, 4, 25, 60, Zone.MAIN_HALL, false, false, true, true));
         // Right wall
-        tableRepository.save(new RestaurantTable(8, 2, 45, 15, Zone.MAIN_HALL, false, false, false, false));
-        tableRepository.save(new RestaurantTable(9, 4, 45, 35, Zone.MAIN_HALL, false, false, false, false));
-        tableRepository.save(new RestaurantTable(10, 8, 45, 55, Zone.MAIN_HALL, false, false, true, true));
+        RestaurantTable t8 = new RestaurantTable(8, 2, 45, 15, Zone.MAIN_HALL, true, false, false, false);
+        t8.setNearStage(true);
+        tableRepository.save(t8);
+        tableRepository.save(new RestaurantTable(9, 4, 45, 35, Zone.MAIN_HALL, true, false, false, false));
+        RestaurantTable t10 = new RestaurantTable(10, 8, 45, 55, Zone.MAIN_HALL, false, false, true, true);
+        t10.setNearStage(true);
+        tableRepository.save(t10);
 
         // Terrace - 6 tables
         tableRepository.save(new RestaurantTable(11, 2, 65, 10, Zone.TERRACE, false, false, false, false));
@@ -51,11 +55,15 @@ public class DataInitializer implements CommandLineRunner {
         tableRepository.save(new RestaurantTable(15, 6, 85, 28, Zone.TERRACE, false, false, false, true));
         tableRepository.save(new RestaurantTable(16, 2, 85, 46, Zone.TERRACE, false, false, false, false));
 
-        // Private rooms - 4 tables
+        // Private rooms - 8 tables
         tableRepository.save(new RestaurantTable(17, 4, 10, 78, Zone.PRIVATE_ROOM, false, true, false, false));
         tableRepository.save(new RestaurantTable(18, 6, 28, 78, Zone.PRIVATE_ROOM, false, true, false, false));
         tableRepository.save(new RestaurantTable(19, 8, 10, 92, Zone.PRIVATE_ROOM, true, true, false, true));
         tableRepository.save(new RestaurantTable(20, 10, 28, 92, Zone.PRIVATE_ROOM, false, true, false, true));
+        tableRepository.save(new RestaurantTable(21, 2, 43, 76, Zone.PRIVATE_ROOM, false, true, false, false));
+        tableRepository.save(new RestaurantTable(22, 2, 53, 76, Zone.PRIVATE_ROOM, false, true, false, false));
+        tableRepository.save(new RestaurantTable(23, 4, 43, 89, Zone.PRIVATE_ROOM, false, true, false, false));
+        tableRepository.save(new RestaurantTable(24, 4, 53, 89, Zone.PRIVATE_ROOM, false, true, false, false));
     }
 
     private void createRandomReservations() {

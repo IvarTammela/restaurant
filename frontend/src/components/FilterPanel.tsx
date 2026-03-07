@@ -4,6 +4,7 @@ interface Props {
   filters: Filters;
   onChange: (filters: Filters) => void;
   onSearch: () => void;
+  maxPartySize: number;
 }
 
 const zones: { value: Zone | ''; label: string }[] = [
@@ -13,7 +14,7 @@ const zones: { value: Zone | ''; label: string }[] = [
   { value: 'PRIVATE_ROOM', label: 'Privaatruum' },
 ];
 
-export default function FilterPanel({ filters, onChange, onSearch }: Props) {
+export default function FilterPanel({ filters, onChange, onSearch, maxPartySize }: Props) {
   const update = (field: Partial<Filters>) => onChange({ ...filters, ...field });
 
   return (
@@ -44,11 +45,21 @@ export default function FilterPanel({ filters, onChange, onSearch }: Props) {
           <input
             type="number"
             min={1}
-            max={20}
+            max={maxPartySize || 20}
             value={filters.partySize}
             onChange={(e) => update({ partySize: Number(e.target.value) })}
           />
         </div>
+        {maxPartySize > 0 && (
+          <div className="max-party-info">
+            Maksimaalne seltskond on {maxPartySize} inimest
+          </div>
+        )}
+        {filters.partySize > 10 && (
+          <div className="large-group-info">
+            Suure seltskonna jaoks otsime sobivaid laudade kombinatsioone
+          </div>
+        )}
 
         <div className="filter-group">
           <label>Tsoon</label>
@@ -103,6 +114,15 @@ export default function FilterPanel({ filters, onChange, onSearch }: Props) {
             />
             <span className="checkmark"></span>
             Ligipaasetav
+          </label>
+          <label className="checkbox-label">
+            <input
+              type="checkbox"
+              checked={filters.nearStage}
+              onChange={(e) => update({ nearStage: e.target.checked })}
+            />
+            <span className="checkmark"></span>
+            Lava lahedal &#127925;
           </label>
         </div>
       </div>

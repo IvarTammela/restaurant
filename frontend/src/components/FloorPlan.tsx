@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { RestaurantTable, TableRecommendation, Reservation } from '../types';
 
 interface Props {
@@ -10,6 +11,16 @@ interface Props {
   onSelectTable: (table: RestaurantTable) => void;
 }
 
+// How far each table moves toward the other (fraction of total distance)
+const COMBINE_FRACTION = 0.28;
+
+function getMovedPos(table: RestaurantTable, other: RestaurantTable) {
+  return {
+    x: table.posX + (other.posX - table.posX) * COMBINE_FRACTION,
+    y: table.posY + (other.posY - table.posY) * COMBINE_FRACTION,
+  };
+}
+
 export default function FloorPlan({
   tables,
   recommendations,
@@ -19,30 +30,66 @@ export default function FloorPlan({
   filterTime,
   onSelectTable,
 }: Props) {
-  const recommendedIds = new Set(recommendations.map((r) => r.table.id));
   const scoreMap = new Map(recommendations.map((r) => [r.table.id, r.score]));
 
-  // Determine which tables are occupied at the selected date/time
+  // combinedMap: tableId -> the other table it's merged with
+  const combinedMap = new Map<number, RestaurantTable>();
+  const combinedPairs: Array<{ t1: RestaurantTable; t2: RestaurantTable; totalSeats: number }> = [];
+  const singleRecommendedIds = new Set<number>();
+
+  recommendations.forEach((r) => {
+    if (r.combinedWith) {
+      combinedMap.set(r.table.id, r.combinedWith);
+      combinedMap.set(r.combinedWith.id, r.table);
+      combinedPairs.push({
+        t1: r.table,
+        t2: r.combinedWith,
+        totalSeats: r.table.seats + r.combinedWith.seats,
+      });
+    } else {
+      singleRecommendedIds.add(r.table.id);
+    }
+  });
+
   const occupiedIds = new Set(
     reservations
       .filter((r) => {
         if (!filterDate || !filterTime) return false;
         if (r.date !== filterDate) return false;
-        const start = r.startTime;
-        const end = r.endTime;
         const check = filterTime + ':00';
-        return check >= start && check < end;
+        return check >= r.startTime && check < r.endTime;
       })
       .map((r) => r.table.id)
   );
 
   const hasSearched = recommendations.length > 0 || filterDate !== '';
+  const bestScore = recommendations.length > 0 ? recommendations[0].score : 0;
 
   function getTableStatus(table: RestaurantTable) {
     if (selectedTable?.id === table.id) return 'selected';
-    if (recommendedIds.has(table.id)) return 'recommended';
+    if (combinedMap.has(table.id) || singleRecommendedIds.has(table.id)) return 'recommended';
     if (occupiedIds.has(table.id)) return 'occupied';
     return 'available';
+  }
+
+  function getTableStyle(table: RestaurantTable): CSSProperties {
+    const other = combinedMap.get(table.id);
+    if (other) {
+      const moved = getMovedPos(table, other);
+      return { left: `${moved.x}%`, top: `${moved.y}%` };
+    }
+    return { left: `${table.posX}%`, top: `${table.posY}%` };
+  }
+
+  function getTableTitle(table: RestaurantTable): string {
+    const pair = combinedPairs.find((p) => p.t1.id === table.id || p.t2.id === table.id);
+    if (pair) {
+      const other = pair.t1.id === table.id ? pair.t2 : pair.t1;
+      return `Lauad #${table.tableNumber} + #${other.tableNumber} \u2014 ${pair.totalSeats} kohta kokku`;
+    }
+    const score = scoreMap.get(table.id);
+    const base = `Laud ${table.tableNumber} | ${table.seats} kohta | ${getZoneLabel(table.zone)}`;
+    return score !== undefined ? `${base} | Skoor: ${score.toFixed(0)}` : base;
   }
 
   function getZoneLabel(zone: string) {
@@ -54,14 +101,11 @@ export default function FloorPlan({
     }
   }
 
-  // Zone boundaries for visual regions
   const zoneRegions = [
     { zone: 'MAIN_HALL', label: 'Sisesaal', x: 0, y: 0, w: 55, h: 70 },
     { zone: 'TERRACE', label: 'Terrass', x: 57, y: 0, w: 43, h: 60 },
-    { zone: 'PRIVATE_ROOM', label: 'Privaatruumid', x: 0, y: 72, w: 50, h: 28 },
+    { zone: 'PRIVATE_ROOM', label: 'Privaatruumid', x: 0, y: 65, w: 60, h: 35 },
   ];
-
-  const bestScore = recommendations.length > 0 ? recommendations[0].score : 0;
 
   return (
     <div className="floor-plan-container">
@@ -75,6 +119,7 @@ export default function FloorPlan({
       </div>
 
       <div className="floor-plan">
+        {/* Zone regions */}
         {zoneRegions.map((region) => (
           <div
             key={region.zone}
@@ -90,23 +135,67 @@ export default function FloorPlan({
           </div>
         ))}
 
+        {/* SVG bridge between combined tables (rendered behind table markers) */}
+        {combinedPairs.length > 0 && (
+          <svg className="floor-plan-bridge" aria-hidden="true">
+            <defs>
+              <filter id="bridge-glow">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feMerge>
+                  <feMergeNode in="blur" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            {combinedPairs.map((pair, i) => {
+              const p1 = getMovedPos(pair.t1, pair.t2);
+              const p2 = getMovedPos(pair.t2, pair.t1);
+              return (
+                <line
+                  key={i}
+                  x1={`${p1.x}%`}
+                  y1={`${p1.y}%`}
+                  x2={`${p2.x}%`}
+                  y2={`${p2.y}%`}
+                  stroke="rgba(212, 169, 74, 0.8)"
+                  strokeWidth="12"
+                  strokeLinecap="round"
+                  filter="url(#bridge-glow)"
+                />
+              );
+            })}
+          </svg>
+        )}
+
+        {/* Static restaurant elements */}
+        <div className="floor-element stage">&#127925; LAVA</div>
+        <div className="floor-element bar">BAAR</div>
+        <div className="floor-element kitchen">KOKK</div>
+        <div className="floor-element playground">&#x1F9F8;</div>
+        <div className="floor-element door">&#x2191;</div>
+
+        {/* Tables */}
         {tables.map((table) => {
           const status = getTableStatus(table);
           const score = scoreMap.get(table.id);
-          const isBest = score !== undefined && score === bestScore && hasSearched;
+          const isCombined = combinedMap.has(table.id);
+          const isBest = score !== undefined && score === bestScore && hasSearched && !isCombined;
           const isClickable = status !== 'occupied';
+          const sizeClass = `seats-${table.seats <= 2 ? 'small' : table.seats <= 4 ? 'medium' : table.seats <= 6 ? 'large' : 'xlarge'}`;
 
           return (
             <div
               key={table.id}
-              className={`table-marker ${status} ${isBest ? 'best' : ''} seats-${table.seats <= 2 ? 'small' : table.seats <= 4 ? 'medium' : table.seats <= 6 ? 'large' : 'xlarge'}`}
-              style={{ left: `${table.posX}%`, top: `${table.posY}%` }}
+              className={`table-marker ${status} ${isBest ? 'best' : ''} ${isCombined ? 'combined' : ''} ${sizeClass}`}
+              style={getTableStyle(table)}
               onClick={() => isClickable && onSelectTable(table)}
-              title={`Laud ${table.tableNumber} | ${table.seats} kohta | ${getZoneLabel(table.zone)}${score !== undefined ? ` | Skoor: ${score}` : ''}`}
+              title={getTableTitle(table)}
             >
               <span className="table-number">{table.tableNumber}</span>
               <span className="table-seats">{table.seats}</span>
-              {score !== undefined && <span className="table-score">{score.toFixed(0)}p</span>}
+              {score !== undefined && !isCombined && (
+                <span className="table-score">{score.toFixed(0)}p</span>
+              )}
             </div>
           );
         })}

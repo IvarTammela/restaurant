@@ -136,6 +136,27 @@
   background: #1a1a1a;
 }
 
+/* ===== Party Size Info ===== */
+.max-party-info {
+  grid-column: span 2;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
+  padding: 0.2rem 0;
+}
+
+.large-group-info {
+  grid-column: span 2;
+  font-size: 0.7rem;
+  color: rgba(212, 169, 74, 0.7);
+  border: 1px solid rgba(212, 169, 74, 0.2);
+  background: rgba(212, 169, 74, 0.05);
+  border-radius: var(--radius);
+  padding: 0.5rem 0.7rem;
+  letter-spacing: 0.3px;
+  line-height: 1.4;
+}
+
 /* ===== Preferences ===== */
 .preferences {
   margin-top: 1.5rem;
@@ -246,7 +267,7 @@
 }
 
 .search-btn:hover {
-  color: #000;
+  color: #1a1a1a;
 }
 
 .search-btn:disabled {
@@ -348,6 +369,107 @@
 .zone-terrace     { background: rgba(212, 169, 74, 0.02); }
 .zone-private_room { background: rgba(155, 127, 212, 0.03); }
 
+/* ===== Static Floor Elements ===== */
+.floor-element {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.55rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+}
+
+.door {
+  left: 25%;
+  bottom: 2%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  color: rgba(201, 169, 110, 0.5);
+  letter-spacing: 0;
+  background: none;
+  border: none;
+}
+
+.bar {
+  right: 59%;
+  top: 2%;
+  width: 60px;
+  height: 25px;
+  background: rgba(155, 127, 212, 0.12);
+  border: 1px solid rgba(155, 127, 212, 0.3);
+  border-radius: 2px;
+  font-size: 0.5rem;
+  color: rgba(155, 127, 212, 0.6);
+  font-weight: 500;
+}
+
+.kitchen {
+  right: 7%;
+  bottom: 3%;
+  width: 60px;
+  height: 25px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px dashed rgba(255, 255, 255, 0.15);
+  border-radius: 2px;
+  font-size: 0.5rem;
+  color: rgba(255, 255, 255, 0.3);
+  font-weight: 500;
+}
+
+.playground {
+  left: 42%;
+  top: 80%;
+  width: 28px;
+  height: 28px;
+  background: rgba(255, 200, 100, 0.06);
+  border: 1px solid rgba(255, 200, 100, 0.15);
+  border-radius: 50%;
+  font-size: 0.75rem;
+  letter-spacing: 0;
+}
+
+.stage {
+  left: 2%;
+  top: 2%;
+  width: 32%;
+  height: 22px;
+  background: rgba(140, 30, 30, 0.12);
+  border: 1px solid rgba(200, 80, 80, 0.35);
+  border-radius: 2px;
+  font-size: 0.5rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-style: italic;
+  letter-spacing: 3px;
+  color: rgba(220, 130, 130, 0.65);
+}
+
+
+
+/* ===== Floor Plan SVG Bridge ===== */
+.floor-plan-bridge {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
+.floor-plan-bridge line {
+  animation: bridgeAppear 0.3s ease 0.25s both;
+}
+
+@keyframes bridgeAppear {
+  from { opacity: 0; stroke-width: 0; }
+  to   { opacity: 1; stroke-width: 12; }
+}
+
 /* ===== Table Markers ===== */
 .table-marker {
   position: absolute;
@@ -358,9 +480,15 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: left 0.4s ease, top 0.4s ease, box-shadow 0.4s ease, transform 0.2s ease;
   border: 1px solid transparent;
-  z-index: 1;
+  z-index: 2;
+}
+
+.table-marker.combined {
+  box-shadow: 0 0 0 2px rgba(212, 169, 74, 0.9), 0 0 18px rgba(212, 169, 74, 0.4) !important;
+  animation: none !important;
+  z-index: 3;
 }
 
 .table-marker.seats-small  { width: 44px; height: 38px; }

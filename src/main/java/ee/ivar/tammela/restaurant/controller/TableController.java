@@ -4,7 +4,6 @@ import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
 import ee.ivar.tammela.restaurant.model.Zone;
 import ee.ivar.tammela.restaurant.repository.TableRepository;
-import ee.ivar.tammela.restaurant.service.RecommendationService;
 import ee.ivar.tammela.restaurant.service.ReservationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -22,7 +21,6 @@ public class TableController {
 
     private final TableRepository tableRepository;
     private final ReservationService reservationService;
-    private final RecommendationService recommendationService;
 
     private static final int DEFAULT_DURATION_HOURS = 2;
 
@@ -59,18 +57,13 @@ public class TableController {
             @RequestParam(defaultValue = "false") boolean windowSeat,
             @RequestParam(defaultValue = "false") boolean privateArea,
             @RequestParam(defaultValue = "false") boolean nearPlayground,
-            @RequestParam(defaultValue = "false") boolean accessible) {
+            @RequestParam(defaultValue = "false") boolean accessible,
+            @RequestParam(defaultValue = "false") boolean nearStage) {
 
         LocalTime endTime = time.plusHours(DEFAULT_DURATION_HOURS);
-        List<RestaurantTable> recommended = reservationService.recommendTables(
+        List<TableRecommendation> result = reservationService.recommendTables(
                 date, time, endTime, partySize, zone,
-                windowSeat, privateArea, nearPlayground, accessible);
-
-        List<TableRecommendation> result = recommended.stream()
-                .map(t -> new TableRecommendation(t,
-                        recommendationService.scoreTable(t, partySize,
-                                windowSeat, privateArea, nearPlayground, accessible)))
-                .toList();
+                windowSeat, privateArea, nearPlayground, accessible, nearStage);
 
         return ResponseEntity.ok(result);
     }

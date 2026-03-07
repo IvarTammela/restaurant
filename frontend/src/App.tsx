@@ -10,6 +10,11 @@ function todayStr() {
   return new Date().toISOString().split('T')[0];
 }
 
+function calcMaxPartySize(tables: import('./types').RestaurantTable[]): number {
+  const sorted = [...tables].sort((a, b) => b.seats - a.seats);
+  return (sorted[0]?.seats ?? 0) + (sorted[1]?.seats ?? 0);
+}
+
 function App() {
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [recommendations, setRecommendations] = useState<TableRecommendation[]>([]);
@@ -27,6 +32,7 @@ function App() {
     privateArea: false,
     nearPlayground: false,
     accessible: false,
+    nearStage: false,
   });
 
   useEffect(() => {
@@ -70,7 +76,12 @@ function App() {
 
       <main className="app-main">
         <aside className="sidebar">
-          <FilterPanel filters={filters} onChange={setFilters} onSearch={handleSearch} />
+          <FilterPanel
+            filters={filters}
+            onChange={setFilters}
+            onSearch={handleSearch}
+            maxPartySize={calcMaxPartySize(tables)}
+          />
         </aside>
 
         <section className="content">

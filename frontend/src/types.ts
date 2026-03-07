@@ -9,6 +9,7 @@ export interface RestaurantTable {
   privateArea: boolean;
   nearPlayground: boolean;
   accessible: boolean;
+  nearStage: boolean;
 }
 
 export type Zone = 'MAIN_HALL' | 'TERRACE' | 'PRIVATE_ROOM';
@@ -26,6 +27,7 @@ export interface Reservation {
 export interface TableRecommendation {
   table: RestaurantTable;
   score: number;
+  combinedWith?: RestaurantTable;
 }
 
 export interface Filters {
@@ -37,4 +39,5 @@ export interface Filters {
   privateArea: boolean;
   nearPlayground: boolean;
   accessible: boolean;
+  nearStage: boolean;
 }

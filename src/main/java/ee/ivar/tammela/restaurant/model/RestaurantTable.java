@@ -29,6 +29,7 @@ public class RestaurantTable {
     private boolean privateArea;
     private boolean nearPlayground;
     private boolean accessible;
+    private boolean nearStage;
 
     public RestaurantTable(int tableNumber, int seats, double posX, double posY,
                            Zone zone, boolean windowSeat, boolean privateArea,
@@ -42,5 +43,6 @@ public class RestaurantTable {
         this.privateArea = privateArea;
         this.nearPlayground = nearPlayground;
         this.accessible = accessible;
+        this.nearStage = false;
     }
 }
