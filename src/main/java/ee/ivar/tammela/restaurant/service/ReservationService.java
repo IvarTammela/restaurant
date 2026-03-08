@@ -1,5 +1,6 @@
 package ee.ivar.tammela.restaurant.service;
 
+import ee.ivar.tammela.restaurant.dto.Preferences;
 import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.Reservation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
@@ -43,13 +44,9 @@ public class ReservationService {
 
     public List<TableRecommendation> recommendTables(LocalDate date, LocalTime startTime,
                                                       LocalTime endTime, int partySize,
-                                                      Zone zone,
-                                                      boolean prefWindow, boolean prefPrivate,
-                                                      boolean prefPlayground, boolean prefAccessible,
-                                                      boolean prefStage) {
+                                                      Zone zone, Preferences prefs) {
         List<RestaurantTable> available = findAvailableTables(date, startTime, endTime, zone);
-        return recommendationService.recommend(available, partySize,
-                prefWindow, prefPrivate, prefPlayground, prefAccessible, prefStage);
+        return recommendationService.recommend(available, partySize, prefs);
     }
 
     public Reservation createReservation(Long tableId, String customerName,

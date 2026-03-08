@@ -26,7 +26,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createReservation(@RequestBody ReservationRequest request) {
+    public ResponseEntity<Object> createReservation(@RequestBody ReservationRequest request) {
         try {
             Reservation reservation = reservationService.createReservation(
                     request.getTableId(),

@@ -1,5 +1,7 @@
 package ee.ivar.tammela.restaurant.controller;
 
+import ee.ivar.tammela.restaurant.dto.Preferences;
+import ee.ivar.tammela.restaurant.dto.TableDTO;
 import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
 import ee.ivar.tammela.restaurant.model.Zone;
@@ -65,9 +67,9 @@ public class TableController {
             @RequestParam(defaultValue = "false") boolean nearStage) {
 
         LocalTime endTime = time.plusHours(DEFAULT_DURATION_HOURS);
+        Preferences prefs = new Preferences(windowSeat, privateArea, nearPlayground, accessible, nearStage);
         List<TableRecommendation> result = reservationService.recommendTables(
-                date, time, endTime, partySize, zone,
-                windowSeat, privateArea, nearPlayground, accessible, nearStage);
+                date, time, endTime, partySize, zone, prefs);
 
         return ResponseEntity.ok(result);
     }
@@ -101,8 +103,19 @@ public class TableController {
     }
 
     @PostMapping
-    public ResponseEntity<RestaurantTable> createTable(@RequestBody RestaurantTable table) {
-        table.setId(null);
+    public ResponseEntity<RestaurantTable> createTable(@RequestBody TableDTO dto) {
+        RestaurantTable table = RestaurantTable.builder()
+                .tableNumber(dto.getTableNumber())
+                .seats(dto.getSeats())
+                .posX(dto.getPosX())
+                .posY(dto.getPosY())
+                .zone(dto.getZone())
+                .windowSeat(dto.isWindowSeat())
+                .privateArea(dto.isPrivateArea())
+                .nearPlayground(dto.isNearPlayground())
+                .accessible(dto.isAccessible())
+                .nearStage(dto.isNearStage())
+                .build();
         return ResponseEntity.ok(tableRepository.save(table));
     }
 

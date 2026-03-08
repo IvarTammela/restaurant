@@ -1,5 +1,6 @@
 package ee.ivar.tammela.restaurant.controller;
 
+import ee.ivar.tammela.restaurant.dto.FloorElementDTO;
 import ee.ivar.tammela.restaurant.model.FloorElement;
 import ee.ivar.tammela.restaurant.repository.FloorElementRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,8 +23,12 @@ public class FloorElementController {
     }
 
     @PostMapping
-    public ResponseEntity<FloorElement> create(@RequestBody FloorElement element) {
-        element.setId(null);
+    public ResponseEntity<FloorElement> create(@RequestBody FloorElementDTO dto) {
+        FloorElement element = new FloorElement(
+                dto.getType(), dto.getName(),
+                dto.getPosX(), dto.getPosY(),
+                dto.getWidth(), dto.getHeight(),
+                dto.getRotation());
         return ResponseEntity.ok(repository.save(element));
     }
 

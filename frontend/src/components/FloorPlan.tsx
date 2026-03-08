@@ -118,6 +118,8 @@ export default function FloorPlan({
         <span className="legend-item"><span className="dot occupied"></span> Hoivatud</span>
         <span className="legend-item"><span className="dot recommended"></span> Soovitatud</span>
         <span className="legend-item"><span className="dot selected"></span> Valitud</span>
+        <span className="legend-separator">|</span>
+        <span className="legend-item legend-hint">Laua number / istekohta</span>
       </div>
 
       <div className="floor-plan">
@@ -182,8 +184,12 @@ export default function FloorPlan({
               transform: elem.rotation ? `rotate(${elem.rotation}deg)` : undefined,
               position: 'absolute',
             }}
+            title={elem.name}
           >
-            {elem.name}
+            {elem.type === 'window' ? <span className="element-icon">{elem.name}</span>
+              : elem.type === 'door' ? <span className="element-icon">{elem.name}</span>
+              : elem.type === 'facility' ? <span className="element-icon">{elem.name}</span>
+              : elem.name}
           </div>
         ))}
 
@@ -205,7 +211,7 @@ export default function FloorPlan({
               title={getTableTitle(table)}
             >
               <span className="table-number">{table.tableNumber}</span>
-              <span className="table-seats">{table.seats}</span>
+              <span className="table-seats" title={`${table.seats} istekohta`}>{table.seats}</span>
               {score !== undefined && !isCombined && (
                 <span className="table-score">{score.toFixed(0)}p</span>
               )}
