@@ -23,6 +23,7 @@ public class DataInitializer implements CommandLineRunner {
     private final TableRepository tableRepository;
     private final ReservationRepository reservationRepository;
     private final FloorElementRepository floorElementRepository;
+    private final SecureRandom random = new SecureRandom();
 
     @Override
     public void run(String... args) {
@@ -103,7 +104,6 @@ public class DataInitializer implements CommandLineRunner {
 
     private void createRandomReservations() {
         List<RestaurantTable> tables = tableRepository.findAll();
-        SecureRandom random = new SecureRandom();
         LocalDate today = LocalDate.now();
 
         String[] names = {"Mari Mets", "Jaan Tamm", "Kati Kask", "Peeter Paju",
