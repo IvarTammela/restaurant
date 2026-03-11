@@ -1,200 +1,229 @@
-# 🍽️ La Maison — Restorani Reserveerimissüsteem
+# La Maison — Smart Restaurant Reservation System
 
-> CGI Suvepraktika 2026 proovitöö — Ivar Tammela
+> CGI Summer Internship 2026 — Ivar Tammela
 
-[![SonarCloud](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
-[![Security Rating](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
-[![Reliability Rating](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
+[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
+[![Security](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=security_rating)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
+[![Reliability](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=reliability_rating)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
 
----
+A full-stack restaurant reservation app with an **interactive floor plan**, **score-based table recommendations**, and a **drag-and-drop admin editor**. Guests pick their ideal table visually — the algorithm finds the best match based on party size and seating preferences.
 
-## Ülevaade
+### Booking Flow
 
-Veebirakendus restorani laudade broneerimiseks ja haldamiseks. Külastaja näeb visuaalset saaliplaani, saab filtreerida vabu laudu ning rakendus soovitab sobivaimat lauda seltskonna suuruse ja eelistuste põhjal.
+![Booking flow — filter, recommend, reserve](docs/booking-flow.gif)
 
----
+### Admin Editor
 
-## Funktsionaalsus
-
-### Külastaja vaade
-- **Visuaalne saaliplaaan** — lauad kolmes tsoonis: Sisesaal, Terrass, Privaatruumid
-- **Filtreerimine** — kuupäev, kellaaeg, seltskonna suurus, tsoon
-- **Eelistused** — akna all, privaatne nurk, mängunurga lähedal, ligipääsetav, lava lähedal
-- **Soovitusalgoritm** — skooripõhine (max 102p): suuruse sobivus + eelistused
-- **Laudade liitmine** — suurele seltskonnale (>10) soovitatakse kahte kõrvuti asuvat lauda
-- **Broneerimine** — laual klikk → modaal → kinnita broneering
-
-### Admin vaade
-- **Drag & drop** — laudade lohistamine ja automaatne salvestamine
-- **Lisa laud** — vali kohtade arv ja tsoon, kliki saaliplaanile
-- **Lisa ruum** — joonista hiirega uus tsoon, anna nimi
-- **Lisa element** — Baar, Köök, Lava, Uks, Aken, Mängunurk
-- **Elementide muutmine** — kliki elemendil → muuda nime, suurust, pöördenurka
-- **Resize & rotate** — nurga ja pöörlemise handle'id
+![Admin view — drag tables, manage floor elements](docs/admin-view.gif)
 
 ---
 
-## Tehnoloogiad
+## Table of Contents
 
-| Kiht | Tehnoloogia |
-|------|-------------|
-| Backend | Spring Boot 3.5.11, Java 21 |
-| Andmebaas | H2 in-memory |
-| Frontend | React 19, TypeScript, Vite |
-| Stiilid | CSS (custom dark gold teema) |
-| Versioonikontroll | Git + GitHub |
-| Koodikvaliteet | SonarCloud (Security A, Reliability A, Maintainability A) |
+- [Key Features](#key-features)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [How the Recommendation Algorithm Works](#how-the-recommendation-algorithm-works)
+- [API Reference](#api-reference)
+- [Project Structure](#project-structure)
+- [Known Limitations](#known-limitations)
+- [Development Notes](#development-notes)
+- [AI Tools Disclosure](#ai-tools-disclosure)
 
 ---
 
-## Käivitamine
+## Key Features
 
-### Eeldused
-- Java 21+
-- Node.js 18+
+### Guest View
 
-### Backend
+- **Visual floor plan** — three zones: Main Hall, Terrace, Private Rooms
+- **Smart filters** — date, time, party size, zone
+- **Preference matching** — window seat, private corner, near playground, accessible, near stage
+- **Table recommendations** — score-based ranking (max 102 pts) considering size fit + preferences
+- **Auto table merging** — for parties of 10+ the system suggests two adjacent tables
+- **One-click booking** — click a table → confirm in the modal → done
+
+### Admin View
+
+- **Drag & drop** — reposition tables with auto-save
+- **Add tables** — pick seat count and zone, click to place
+- **Add rooms** — draw a new zone with your mouse
+- **Floor elements** — bar, kitchen, stage, door, window, playground
+- **Resize & rotate** — corner handle for resizing, top handle for rotation
+- **Edit panel** — modify element name, dimensions, and rotation angle
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Backend | Spring Boot 3.5.11, Java 21, JPA, Lombok |
+| Database | H2 (in-memory) |
+| Frontend | React 19, TypeScript, Vite 7 |
+| Styling | Custom CSS (dark gold theme) |
+| Code Quality | SonarCloud — all A ratings, 0% duplication |
+
+---
+
+## Quick Start
+
+**Prerequisites:** Java 21+, Node.js 18+
+
+### 1. Backend
+
 ```bash
 ./mvnw spring-boot:run
 ```
-Backend käivitub aadressil: `http://localhost:8080`
 
-H2 konsool: `http://localhost:8080/h2-console`
+Starts at `http://localhost:8080`
+
+H2 Console: `http://localhost:8080/h2-console`
 - JDBC URL: `jdbc:h2:mem:restaurant`
-- Username: `sa`
-- Password: *(tühi)*
+- Username: `sa` / Password: *(empty)*
 
-### Frontend
+### 2. Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
-Frontend käivitub aadressil: `http://localhost:5173`
+
+Opens at `http://localhost:5173`
+
+That's it — the app seeds 24 tables and ~12–16 random reservations on startup.
 
 ---
 
-## API endpointid
+## How the Recommendation Algorithm Works
 
-| Meetod | URL | Kirjeldus |
-|--------|-----|-----------|
-| GET | `/api/tables` | Kõik lauad |
-| GET | `/api/tables/available` | Vabad lauad filtritega |
-| GET | `/api/tables/recommend` | Soovitused skoorimisega |
-| POST | `/api/tables` | Uus laud |
-| PUT | `/api/tables/{id}` | Uuenda lauda |
-| PUT | `/api/tables/{id}/position` | Uuenda laua asukohta |
-| DELETE | `/api/tables/{id}` | Kustuta laud |
-| GET | `/api/reservations` | Kõik broneeringud |
-| POST | `/api/reservations` | Uus broneering |
-| GET | `/api/rooms` | Kõik tsoonid |
-| GET | `/api/elements` | Kõik saali elemendid |
-| POST | `/api/elements` | Uus element |
-| PUT | `/api/elements/{id}` | Uuenda elementi |
-| DELETE | `/api/elements/{id}` | Kustuta element |
+Each available table receives a score (max 102 points):
 
----
+### Size Fit (max 50 pts)
 
-## Soovitusalgoritm
+| Condition | Score |
+|-----------|-------|
+| Seats = party size | 50 |
+| Seats = party size + 1 | 42 |
+| Seats = party size + 2 | 34 |
+| Each additional extra seat | −8 |
 
-Iga vaba laud saab skoori (max 102 punkti):
+A table with 6 extra seats scores only 2 pts — the algorithm strongly prefers a snug fit.
 
-**Suuruse sobivus (max 50p):**
-- `seats == partySize` → 50p
-- `seats == partySize + 1` → 42p
-- `seats == partySize + 2` → 34p
-- Iga liigne koht vähendab skoori 8p võrra (nt 4-liikmelisele seltskonnale 10-kohalisel laual on suuruse skoor 2p)
+### Preference Bonus (max 50 pts)
 
-**Eelistused (max 50p):**
-- Akna all → +10p
-- Privaatne nurk → +10p
-- Mängunurga lähedal → +10p
-- Ligipääsetav → +10p
-- Lava lähedal → +10p
+Each matching preference adds **10 pts**: window seat, private corner, near playground, accessible, near stage.
 
-**Ligipääsetavuse boonus:** +2p (alati, kui laud on ligipääsetav)
+### Accessibility Bonus
 
-**Laudade liitmine:** kui `partySize > 10`, otsitakse kaks kõrvuti asuvat vaba lauda (Eukleidiline kaugus < 35%) ja soovitatakse neid kombinatsioonina.
+All accessible tables get **+2 pts** regardless of preferences.
+
+### Table Merging
+
+When `partySize > 10`, the system finds pairs of free tables within Euclidean distance < 35% of floor plan width and recommends the best-scoring combination.
 
 ---
 
-## Projekti struktuur
+## API Reference
+
+### Tables
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/tables` | All tables |
+| `GET` | `/api/tables/available` | Available tables (with filters) |
+| `GET` | `/api/tables/recommend` | Scored recommendations |
+| `POST` | `/api/tables` | Create table |
+| `PUT` | `/api/tables/{id}` | Update table |
+| `PUT` | `/api/tables/{id}/position` | Update position |
+| `DELETE` | `/api/tables/{id}` | Delete table |
+
+### Reservations
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/reservations` | All reservations |
+| `POST` | `/api/reservations` | Create reservation |
+
+### Rooms & Elements
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/api/rooms` | All zones |
+| `GET` | `/api/elements` | All floor elements |
+| `POST` | `/api/elements` | Create element |
+| `PUT` | `/api/elements/{id}` | Update element |
+| `DELETE` | `/api/elements/{id}` | Delete element |
+
+---
+
+## Project Structure
 
 ```
 restaurant/
 ├── src/main/java/ee/ivar/tammela/restaurant/
 │   ├── config/          # DataInitializer, WebConfig (CORS)
-│   ├── controller/      # REST kontrollerid
-│   ├── dto/             # Andmeedastuse objektid
-│   ├── model/           # JPA entiteedid
-│   ├── repository/      # Spring Data repositooriumid
-│   └── service/         # Äriloogika
+│   ├── controller/      # REST controllers
+│   ├── dto/             # Data transfer objects
+│   ├── model/           # JPA entities (Table, Reservation, Room, FloorElement)
+│   ├── repository/      # Spring Data repositories
+│   └── service/         # Business logic (scoring, merging)
 └── frontend/src/
     ├── components/
-    │   ├── FilterPanel.tsx       # Filtrite paneel
-    │   ├── FloorPlan.tsx         # Visuaalne saaliplaaan
-    │   ├── AdminFloorPlan.tsx    # Admin vaade
-    │   └── ReservationModal.tsx  # Broneerimise modaal
-    ├── api.ts           # API kliendi funktsioonid
-    └── types.ts         # TypeScript tüübid
+    │   ├── FilterPanel.tsx       # Search filters
+    │   ├── FloorPlan.tsx         # Guest floor plan view
+    │   ├── AdminFloorPlan.tsx    # Admin editor
+    │   └── ReservationModal.tsx  # Booking modal
+    ├── api.ts           # API client
+    └── types.ts         # TypeScript types
 ```
 
 ---
 
-## Ajakulu ja märkmed
+## Known Limitations
 
-**Kokku:** ~8 tundi (ühe õhtu + hommiku töö)
-
-### Mis oli keeruline
-
-**Spring Boot õppimine nullist** — Java/Spring Boot kogemus puudus enne seda projekti. Suurim väljakutse oli JPA annotationid (`@Entity`, `@ManyToOne`, `@JoinColumn`) ja Spring-ile omane dependency injection mõistmine. Abi sain Spring Boot ametlikust dokumentatsioonist ja Baeldung tutorialitest.
-
-**Drag & drop admin vaates** — esimene katse kasutas HTML5 native drag & drop API-t, mis ei töötanud korrektselt (hiire lahkumine elemendilt katkestas lohistamise). Lahendasin ümber kirjutades `document`-tasemel `mousemove`/`mouseup` event listeneritega ja `useRef` hook-iga stale closure probleemide vältimiseks.
-
-**Soovitusalgoritmi kalibreerimine** — esialgu soovitas algoritm 4-liikmelisele seltskonnale 10-kohalist lauda kui see oli kõrgema skooriga. Parandasin karistussüsteemi et liiga suured lauad saaksid oluliselt madalama skoori.
-
-**CORS seadistus** — backend port 8080 ja frontend port 5173, Spring Boot CORS ei lubanud päringuid. Lahendus: `WebConfig.java` klass `@Configuration` annotationiga.
-
-### Lahendamata probleemid
-
-- **Broneeringute persistence** — H2 on in-memory andmebaas, kõik broneeringud kaovad serveri taaskäivitusel. Tootmiskeskkonnas tuleks kasutada PostgreSQL-i või MySQL-i.
-- **Autentimine** — admin vaade on praegu kõigile ligipääsetav. Tootmises peaks olema JWT-põhine autentimine.
-- **Mobiilivaade** — UI on optimeeritud desktop kasutamiseks.
-
-### Eeldused ülesande tõlgendamisel
-
-- "Juhuslikult genereeritud broneeringud" — DataInitializer loob ~12-16 juhuslikku broneeringut käivitamisel
-- `"Kõrvuti asuvad lauad"` — lauad mis on saaliplaanilt vaadates füüsiliselt üksteise kõrval
-- "Keskmine külastuse aeg" — endTime = startTime + 2h (kõvakodeeritud)
+| Issue | Reason | Production Fix |
+|-------|--------|----------------|
+| Data resets on restart | H2 in-memory DB | Use PostgreSQL / MySQL |
+| No authentication | Out of scope for prototype | Add JWT-based auth |
+| Desktop only | Optimized for larger screens | Add responsive CSS |
+| Fixed visit duration | `endTime = startTime + 2h` | Let guests choose duration |
 
 ---
 
-## AI tööriistade kasutamine
+## Development Notes
 
-Projekt on arendatud kasutades **Claude AI** (Anthropic) assistenti:
+**Total time:** ~8 hours (one evening + morning)
 
-- **Arhitektuur ja planeerimine** — Claude aitas planeerida projekti struktuuri ja tehnilist lahendust
-- **Spring Boot kood** — kuna Java/Spring Boot kogemus puudus, genereeris Claude backendi põhikoodi (mudelid, kontrollerid, serviceud). Mina vaatasin koodi üle, mõistsin struktuuri ja andsin juhiseid muudatusteks.
-- **Frontend komponendid** — React komponendid genereeriti AI abiga, CSS disain (dark gold teema) on Claude loodud minu juhiste järgi
-- **Veavõtted** — SonarQube issues lahendamisel kasutasin Claude abi konkreetsete paranduste tegemisel
+### Challenges Solved
 
-**Minu panus:**
-- Kogu projekti kontseptsioon ja funktsionaalsuse disain
-- Kõigi genereeritud lahenduste ülevaatus ja kinnitamine
-- Visuaalne disain ja UI/UX otsused
-- Vigade tuvastamine ja paranduste juhtimine
-- Admin vaate kontseptsioon (drag & drop, ruumide loomine)
-- SonarQube integreerimine ja koodikvaliteedi tagamine
+- **Spring Boot from scratch** — no prior Java/Spring experience. Learned JPA annotations, dependency injection, and REST patterns from official docs + Baeldung.
+- **Drag & drop** — HTML5 native drag API broke when the cursor left the element. Rewrote using document-level `mousemove`/`mouseup` listeners with `useRef` to avoid stale closures.
+- **Algorithm calibration** — early version recommended oversized tables. Fixed by adding steep penalties for extra seats (−8 pts each).
+- **CORS** — backend on `:8080`, frontend on `:5173`. Resolved with a `WebConfig` class using `@Configuration`.
+
+### Design Decisions
+
+- **Percentage-based positioning** (0–100%) for tables and elements, so the floor plan scales to any screen size.
+- **Euclidean distance** for table merging — simpler and more intuitive than grid-based adjacency.
+- **Random seed data** — `DataInitializer` creates realistic reservations on each startup for demo purposes.
 
 ---
 
-## SonarCloud
+## AI Tools Disclosure
 
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=IvarTammela_restaurant&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=IvarTammela_restaurant)
+This project was built with **Claude AI** (Anthropic) as a coding assistant:
 
-Projekt läbib SonarCloud quality gate kõigi A-reitingutega:
-- Security: A (0 haavatavust)
-- Reliability: A (0 bugi)
-- Maintainability: A (mõned code smells)
-- Hotspots Reviewed: 100%
-- Duplications: 0.0%
+- **Architecture & planning** — Claude helped design the project structure and technical approach
+- **Backend code** — since Java/Spring Boot was new to me, Claude generated the foundational backend code (models, controllers, services), which I reviewed, understood, and directed
+- **Frontend components** — React components and the dark gold CSS theme were AI-generated under my direction
+- **Bug fixes** — used Claude for targeted SonarQube issue resolution
+
+**My contributions:** project concept and feature design, all code review and approval, visual design and UX decisions, bug identification and fix direction, admin view concept (drag & drop, room creation), SonarCloud integration.
+
+---
+
+## License
+
+This project is part of a CGI internship application and is publicly available for review.
