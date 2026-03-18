@@ -12,15 +12,6 @@ interface Props {
   onSelectTable: (table: RestaurantTable) => void;
 }
 
-// How far each table moves toward the other (fraction of total distance)
-const COMBINE_FRACTION = 0.28;
-
-function getMovedPos(table: RestaurantTable, other: RestaurantTable) {
-  return {
-    x: table.posX + (other.posX - table.posX) * COMBINE_FRACTION,
-    y: table.posY + (other.posY - table.posY) * COMBINE_FRACTION,
-  };
-}
 
 export default function FloorPlan({
   tables,
@@ -75,11 +66,6 @@ export default function FloorPlan({
   }
 
   function getTableStyle(table: RestaurantTable): CSSProperties {
-    const other = combinedMap.get(table.id);
-    if (other) {
-      const moved = getMovedPos(table, other);
-      return { left: `${moved.x}%`, top: `${moved.y}%` };
-    }
     return { left: `${table.posX}%`, top: `${table.posY}%` };
   }
 
@@ -151,23 +137,20 @@ export default function FloorPlan({
                 </feMerge>
               </filter>
             </defs>
-            {combinedPairs.map((pair, i) => {
-              const p1 = getMovedPos(pair.t1, pair.t2);
-              const p2 = getMovedPos(pair.t2, pair.t1);
-              return (
-                <line
-                  key={i}
-                  x1={`${p1.x}%`}
-                  y1={`${p1.y}%`}
-                  x2={`${p2.x}%`}
-                  y2={`${p2.y}%`}
-                  stroke="rgba(212, 169, 74, 0.8)"
-                  strokeWidth="12"
-                  strokeLinecap="round"
-                  filter="url(#bridge-glow)"
-                />
-              );
-            })}
+            {combinedPairs.map((pair, i) => (
+              <line
+                key={i}
+                x1={`${pair.t1.posX}%`}
+                y1={`${pair.t1.posY}%`}
+                x2={`${pair.t2.posX}%`}
+                y2={`${pair.t2.posY}%`}
+                stroke="rgba(200, 125, 56, 0.6)"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeDasharray="4 4"
+                filter="url(#bridge-glow)"
+              />
+            ))}
           </svg>
         )}
 

@@ -61,7 +61,7 @@ A full-stack restaurant reservation app with an **interactive floor plan**, **sc
 | Backend | Spring Boot 3.5.11, Java 21, JPA, Lombok |
 | Database | H2 (in-memory) |
 | Frontend | React 19, TypeScript, Vite 7 |
-| Styling | Custom CSS (dark gold theme) |
+| Styling | Custom CSS (light green/cream theme, responsive) |
 | Code Quality | SonarCloud — all A ratings, 0% duplication |
 
 ---
@@ -187,7 +187,7 @@ restaurant/
 |-------|--------|----------------|
 | Data resets on restart | H2 in-memory DB | Use PostgreSQL / MySQL |
 | No authentication | Out of scope for prototype | Add JWT-based auth |
-| Desktop only | Optimized for larger screens | Add responsive CSS |
+| Mobile support | Basic responsive layout added; complex admin editor works best on desktop | Full mobile redesign of admin drag-drop |
 | Fixed visit duration | `endTime = startTime + 2h` | Let guests choose duration |
 
 ---

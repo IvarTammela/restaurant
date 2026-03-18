@@ -58,11 +58,11 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   }, []);
 
   // --- Table drag state using refs (no stale closures) ---
-  const dragTableRef = useRef<{ id: number; startX: number; startY: number } | null>(null);
+  const dragTableRef = useRef<{ id: number; startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
   const [dragTablePos, setDragTablePos] = useState<{ id: number; x: number; y: number } | null>(null);
 
   // --- Element drag state using refs ---
-  const dragElemRef = useRef<{ id: number; startX: number; startY: number } | null>(null);
+  const dragElemRef = useRef<{ id: number; startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
   const [dragElemPos, setDragElemPos] = useState<{ id: number; x: number; y: number } | null>(null);
 
   // --- Element resize state using refs ---
@@ -169,12 +169,14 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
     // Table drag
     if (dragTableRef.current) {
-      setDragTablePos({ id: dragTableRef.current.id, x: pctX, y: pctY });
+      const { id, offsetX, offsetY } = dragTableRef.current;
+      setDragTablePos({ id, x: pctX - offsetX, y: pctY - offsetY });
     }
 
     // Element drag
     if (dragElemRef.current) {
-      setDragElemPos({ id: dragElemRef.current.id, x: pctX, y: pctY });
+      const { id, offsetX, offsetY } = dragElemRef.current;
+      setDragElemPos({ id, x: pctX - offsetX, y: pctY - offsetY });
     }
 
     // Element resize
@@ -282,14 +284,20 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   function startTableDrag(e: React.MouseEvent, table: RestaurantTable) {
     if (tool !== 'idle') return;
     e.preventDefault(); e.stopPropagation();
-    dragTableRef.current = { id: table.id, startX: table.posX, startY: table.posY };
+    const pos = toPercent(e.clientX, e.clientY);
+    const offsetX = pos.x - table.posX;
+    const offsetY = pos.y - table.posY;
+    dragTableRef.current = { id: table.id, startX: table.posX, startY: table.posY, offsetX, offsetY };
     setDragTablePos({ id: table.id, x: table.posX, y: table.posY });
   }
 
   function startElemDrag(e: React.MouseEvent, elem: FloorElement) {
     if (tool !== 'idle') return;
     e.preventDefault(); e.stopPropagation();
-    dragElemRef.current = { id: elem.id, startX: elem.posX, startY: elem.posY };
+    const pos = toPercent(e.clientX, e.clientY);
+    const offsetX = pos.x - elem.posX;
+    const offsetY = pos.y - elem.posY;
+    dragElemRef.current = { id: elem.id, startX: elem.posX, startY: elem.posY, offsetX, offsetY };
     setDragElemPos({ id: elem.id, x: elem.posX, y: elem.posY });
   }
 
@@ -552,7 +560,7 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
           )}
         </div>
 
-        <button className="admin-tool-btn admin-reset-btn" onClick={handleReset}>&#128465; L\u00e4htesta</button>
+        <button className="admin-tool-btn admin-reset-btn" onClick={handleReset}>🗑 Lähtesta</button>
 
         {saveMsg && <span className="admin-save-msg">{saveMsg}</span>}
 
@@ -673,11 +681,11 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
                 <option value="PRIVATE_ROOM">Privaatruum</option>
               </select></label>
               <div className="admin-checkboxes">
-                <label><input type="checkbox" checked={editWindow} onChange={e => setEditWindow(e.target.checked)} /> Akna \u00e4\u00e4res</label>
+                <label><input type="checkbox" checked={editWindow} onChange={e => setEditWindow(e.target.checked)} /> Akna ääres</label>
                 <label><input type="checkbox" checked={editPrivate} onChange={e => setEditPrivate(e.target.checked)} /> Privaatne</label>
-                <label><input type="checkbox" checked={editPlayground} onChange={e => setEditPlayground(e.target.checked)} /> M\u00e4ngunurk</label>
-                <label><input type="checkbox" checked={editAccessible} onChange={e => setEditAccessible(e.target.checked)} /> Ligip\u00e4\u00e4setav</label>
-                <label><input type="checkbox" checked={editStage} onChange={e => setEditStage(e.target.checked)} /> Lava l\u00e4hedal</label>
+                <label><input type="checkbox" checked={editPlayground} onChange={e => setEditPlayground(e.target.checked)} /> Mängunurk</label>
+                <label><input type="checkbox" checked={editAccessible} onChange={e => setEditAccessible(e.target.checked)} /> Ligipääsetav</label>
+                <label><input type="checkbox" checked={editStage} onChange={e => setEditStage(e.target.checked)} /> Lava lähedal</label>
               </div>
               <div className="admin-edit-actions">
                 <button onClick={saveTableEdit} className="admin-tool-btn active">Salvesta</button>
@@ -700,15 +708,15 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
                 <input type="number" value={editElemWidth} onChange={e => setEditElemWidth(+e.target.value)}
                   min={1} max={100} step={0.5} className="admin-edit-input" />
               </label>
-              <label>K\u00f5rgus (%):
+              <label>Kõrgus (%):
                 <input type="number" value={editElemHeight} onChange={e => setEditElemHeight(+e.target.value)}
                   min={1} max={100} step={0.5} className="admin-edit-input" />
               </label>
-              <label>P\u00f6\u00f6rdenurk:
+              <label>Pöördenurk:
                 <div className="admin-rotation-control">
                   <input type="range" min={0} max={360} value={editElemRotation}
                     onChange={e => setEditElemRotation(+e.target.value)} />
-                  <span className="admin-rotation-value">{editElemRotation}\u00b0</span>
+                  <span className="admin-rotation-value">{editElemRotation}°</span>
                 </div>
               </label>
               <div className="admin-edit-actions">

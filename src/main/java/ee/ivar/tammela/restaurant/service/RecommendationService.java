@@ -9,7 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class RecommendationService {
@@ -85,7 +87,20 @@ public class RecommendationService {
         }
 
         results.sort(Comparator.comparingDouble(TableRecommendation::getScore).reversed());
-        return results;
+
+        // De-duplicate: each table can only appear in one combination
+        List<TableRecommendation> deduped = new ArrayList<>();
+        Set<Long> usedIds = new HashSet<>();
+        for (TableRecommendation rec : results) {
+            long id1 = rec.getTable().getId();
+            long id2 = rec.getCombinedWith().getId();
+            if (!usedIds.contains(id1) && !usedIds.contains(id2)) {
+                deduped.add(rec);
+                usedIds.add(id1);
+                usedIds.add(id2);
+            }
+        }
+        return deduped;
     }
 
     private double distance(RestaurantTable t1, RestaurantTable t2) {
@@ -104,6 +119,13 @@ public class RecommendationService {
         double prefScore1 = prefScore(t1, prefs);
         double prefScore2 = prefScore(t2, prefs);
         score += (prefScore1 + prefScore2) / 2.0;
+
+        // Proximity bonus: closer tables are more practical to combine (max 20 pts)
+        double dist = distance(t1, t2);
+        score += (ADJACENCY_THRESHOLD - dist) / ADJACENCY_THRESHOLD * 20.0;
+
+        // Same-zone bonus: keeping the group in one area is better (15 pts)
+        if (t1.getZone() == t2.getZone()) score += 15;
 
         return score;
     }

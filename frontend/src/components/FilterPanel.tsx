@@ -45,7 +45,6 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
           <input
             type="number"
             min={1}
-            max={maxPartySize || 20}
             value={filters.partySize}
             onChange={(e) => update({ partySize: Number(e.target.value) })}
           />

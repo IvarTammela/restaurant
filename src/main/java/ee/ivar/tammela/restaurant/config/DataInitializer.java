@@ -60,7 +60,7 @@ public class DataInitializer implements CommandLineRunner {
         saveTable(17, 4, 10, 85, Zone.PRIVATE_ROOM, false, true, false, false, false);
         saveTable(18, 6, 25, 85, Zone.PRIVATE_ROOM, false, true, false, false, false);
         saveTable(19, 8, 42, 85, Zone.PRIVATE_ROOM, false, true, false, true, false);
-        saveTable(20, 10, 58, 85, Zone.PRIVATE_ROOM, false, true, false, true, false);
+        saveTable(20, 12, 58, 85, Zone.PRIVATE_ROOM, false, true, false, true, false);
         // Privaatruumid - parempoolne osa
         saveTable(21, 2, 72, 82, Zone.PRIVATE_ROOM, false, true, false, false, false);
         saveTable(22, 2, 82, 82, Zone.PRIVATE_ROOM, false, true, false, false, false);

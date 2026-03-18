@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Jost:wght@300;400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400&family=DM+Sans:wght@300;400;500&display=swap');
 
 *, *::before, *::after {
   margin: 0;
@@ -7,50 +7,45 @@
 }
 
 :root {
-  --bg-primary: #0d0d0d;
-  --bg-secondary: #111111;
-  --bg-card: #161616;
-  --bg-input: #1a1a1a;
-  --accent: #c9a96e;
-  --accent-hover: #e2c48a;
-  --accent-dim: rgba(201, 169, 110, 0.15);
-  --text-primary: #f0ebe3;
-  --text-secondary: #9a9080;
-  --text-muted: #5a5248;
-  --green: #6dbf8a;
-  --green-dim: rgba(109, 191, 138, 0.18);
-  --red: #d97070;
-  --red-dim: rgba(217, 112, 112, 0.18);
-  --yellow: #d4a94a;
-  --yellow-dim: rgba(212, 169, 74, 0.2);
-  --purple: #9b7fd4;
-  --purple-dim: rgba(155, 127, 212, 0.18);
-  --border: rgba(255, 255, 255, 0.07);
-  --border-accent: rgba(201, 169, 110, 0.3);
-  --radius: 4px;
-  --shadow: 0 8px 40px rgba(0, 0, 0, 0.6);
+  --bg-primary: #F4EFE6;
+  --bg-secondary: #EDE6D8;
+  --bg-card: #FFFFFF;
+  --bg-input: #F9F6F0;
+  --accent: #1E5C3A;
+  --accent-hover: #164D30;
+  --accent-dim: rgba(30, 92, 58, 0.08);
+  --accent-mid: rgba(30, 92, 58, 0.15);
+  --text-primary: #2A1F14;
+  --text-secondary: #6B5E50;
+  --text-muted: #A09080;
+  --green: #2E7D52;
+  --green-dim: rgba(46, 125, 82, 0.12);
+  --red: #B94040;
+  --red-dim: rgba(185, 64, 64, 0.1);
+  --yellow: #C87D38;
+  --yellow-dim: rgba(200, 125, 56, 0.13);
+  --purple: #6B52A0;
+  --purple-dim: rgba(107, 82, 160, 0.12);
+  --border: rgba(42, 31, 20, 0.1);
+  --border-accent: rgba(30, 92, 58, 0.25);
+  --radius: 8px;
+  --shadow: 0 4px 24px rgba(42, 31, 20, 0.08);
+  --shadow-hover: 0 8px 32px rgba(42, 31, 20, 0.14);
 }
 
 body {
-  font-family: 'Jost', sans-serif;
+  font-family: 'DM Sans', sans-serif;
   background: var(--bg-primary);
   color: var(--text-primary);
   min-height: 100vh;
   line-height: 1.6;
-  font-weight: 300;
+  font-weight: 400;
 }
 
 #root {
   min-height: 100vh;
 }
 
-::-webkit-scrollbar {
-  width: 4px;
-}
-::-webkit-scrollbar-track {
-  background: var(--bg-primary);
-}
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 2px;
-}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg-secondary); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }

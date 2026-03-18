@@ -75,23 +75,27 @@ function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <h1>La Maison</h1>
-        <p className="subtitle">Restorani laudade broneerimine</p>
-        <nav className="app-nav">
-          <button
-            className={`nav-tab ${activeTab === 'booking' ? 'active' : ''}`}
-            onClick={() => setActiveTab('booking')}
-          >
-            Broneerimine
-          </button>
-          <button
-            className={`nav-tab ${activeTab === 'admin' ? 'active' : ''}`}
-            onClick={() => setActiveTab('admin')}
-          >
-            &#9881; Admin
-          </button>
-        </nav>
-        {activeTab === 'admin' && <div className="admin-badge">ADMIN MODE</div>}
+        <div className="header-brand">
+          <h1>La Maison</h1>
+          <p className="subtitle">Restorani laudade broneerimine</p>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+          {activeTab === 'admin' && <div className="admin-badge">ADMIN MODE</div>}
+          <nav className="app-nav">
+            <button
+              className={`nav-tab ${activeTab === 'booking' ? 'active' : ''}`}
+              onClick={() => setActiveTab('booking')}
+            >
+              Broneerimine
+            </button>
+            <button
+              className={`nav-tab ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+            >
+              &#9881; Admin
+            </button>
+          </nav>
+        </div>
       </header>
 
       <main className="app-main">
