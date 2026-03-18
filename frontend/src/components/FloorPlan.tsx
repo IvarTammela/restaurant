@@ -97,8 +97,6 @@ export default function FloorPlan({
 
   return (
     <div className="floor-plan-container">
-      <h2>Saali plaan</h2>
-
       <div className="legend">
         <span className="legend-item"><span className="dot available"></span> Vaba</span>
         <span className="legend-item"><span className="dot occupied"></span> Hoivatud</span>
