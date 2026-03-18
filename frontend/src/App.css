@@ -434,8 +434,10 @@
 
 .zone-label {
   position: absolute;
-  bottom: 8%;
-  left: 3%;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
   font-size: 0.58rem;
   text-transform: uppercase;
   letter-spacing: 2.5px;
@@ -452,6 +454,7 @@
   position: absolute;
   pointer-events: none;
   z-index: 0;
+  overflow: visible;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -464,8 +467,8 @@
 }
 
 .floor-element.door {
-  font-size: 0.6rem;
-  color: rgba(200, 125, 56, 0.8);
+  font-size: 0.65rem;
+  color: rgba(200, 125, 56, 0.9);
   background: rgba(200, 125, 56, 0.07);
   border: 1px solid rgba(200, 125, 56, 0.25);
   border-radius: 4px;
@@ -503,7 +506,8 @@
 .floor-element.window {
   background: rgba(100, 160, 255, 0.06);
   border: 2px solid rgba(100, 160, 255, 0.2);
-  color: rgba(80, 130, 220, 0.6);
+  color: transparent;
+  overflow: hidden;
 }
 
 .floor-element.facility {
@@ -519,8 +523,7 @@
   justify-content: center;
   gap: 2px;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   width: 100%;
 }
 
