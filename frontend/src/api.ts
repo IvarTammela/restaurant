@@ -1,6 +1,6 @@
 import type { Filters, FloorElement, Reservation, RestaurantTable, TableRecommendation, Zone } from './types';
 
-const BASE = 'http://localhost:8080/api';
+const BASE = import.meta.env.DEV ? 'http://localhost:8080/api' : '/api';
 
 export async function fetchAllTables(): Promise<RestaurantTable[]> {
   const res = await fetch(`${BASE}/tables`);
