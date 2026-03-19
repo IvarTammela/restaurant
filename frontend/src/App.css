@@ -347,9 +347,48 @@
 
 .floor-plan-header {
   display: flex;
-  align-items: baseline;
-  gap: 1rem;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.view-toggle {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.toggle-btn {
+  padding: 6px 16px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+  color: white;
+}
+
+.toggle-btn:hover:not(.active) {
+  background: rgba(42, 31, 20, 0.05);
+}
+
+.admin-preview-toggle {
+  display: flex;
+  gap: 0;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
   margin-bottom: 1rem;
+  width: fit-content;
 }
 
 .floor-plan-header h2 {

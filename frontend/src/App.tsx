@@ -2,8 +2,8 @@ import { useEffect, useState } from 'react';
 import type { Filters, FloorElement, Reservation, RestaurantTable, TableRecommendation } from './types';
 import { fetchAllTables, fetchElements, fetchRecommendations, fetchReservations } from './api';
 import FilterPanel from './components/FilterPanel';
-import FloorPlan from './components/FloorPlan';
-import AdminFloorPlan from './components/AdminFloorPlan';
+import FloorPlanWrapper from './components/FloorPlanWrapper';
+import AdminFloorPlanWrapper from './components/AdminFloorPlanWrapper';
 import ReservationModal from './components/ReservationModal';
 import './App.css';
 
@@ -111,7 +111,7 @@ function App() {
             </aside>
             <section className="content">
               {successMsg && <div className="success-msg">{successMsg}</div>}
-              <FloorPlan
+              <FloorPlanWrapper
                 tables={tables}
                 recommendations={recommendations}
                 reservations={reservations}
@@ -125,7 +125,7 @@ function App() {
           </>
         ) : (
           <section className="content">
-            <AdminFloorPlan tables={tables} floorElements={floorElements} onTablesChange={refreshTables} onElementsChange={refreshElements} />
+            <AdminFloorPlanWrapper tables={tables} floorElements={floorElements} onTablesChange={refreshTables} onElementsChange={refreshElements} />
           </section>
         )}
       </main>
