@@ -8,13 +8,17 @@
 
 A full-stack restaurant reservation app with an **interactive floor plan**, **score-based table recommendations**, and a **drag-and-drop admin editor**. Guests pick their ideal table visually — the algorithm finds the best match based on party size and seating preferences.
 
-### Booking Flow
+### Booking View (2D)
 
-![Booking flow — filter, recommend, reserve](docs/booking-flow.gif)
+![Booking view — filters, recommendations, floor plan](docs/booking-view.png)
+
+### 3D Floor Plan
+
+![3D view — interactive Three.js restaurant view](docs/3d-view.png)
 
 ### Admin Editor
 
-![Admin view — drag tables, manage floor elements](docs/admin-view.gif)
+![Admin view — drag tables, manage floor elements](docs/admin-view.png)
 
 ---
 
