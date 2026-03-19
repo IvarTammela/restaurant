@@ -1,0 +1,7 @@
+[   13440ms] [WARNING] THREE.THREE.Clock: This module has been deprecated. Please use THREE.Timer instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[   14411ms] [WARNING] THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[ 5391983ms] [WARNING] THREE.THREE.Clock: This module has been deprecated. Please use THREE.Timer instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[ 5392025ms] [WARNING] THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[ 5400951ms] [WARNING] THREE.THREE.Clock: This module has been deprecated. Please use THREE.Timer instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[ 5400984ms] [WARNING] THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745
+[ 7151525ms] [WARNING] THREE.WebGLShadowMap: PCFSoftShadowMap has been deprecated. Using PCFShadowMap instead. @ http://localhost:5173/node_modules/.vite/deps/chunk-3HQHLTJQ.js?v=a8279d00:745

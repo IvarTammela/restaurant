@@ -1,0 +1,32 @@
+[ 5919324ms] ReferenceError: FloorPlan is not defined
+    at App (http://localhost:5173/src/App.tsx?t=1773852864431:170:11)
+    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:18507:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:5652:24)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:7473:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:8523:20)
+    at runWithFiberInDEV (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:995:72)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:12559:98)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:12422:43)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:12406:13)
+    at performWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:11825:37)
+[ 5919324ms] [WARNING] %s
+
+%s
+ An error occurred in the <App> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:6963
+[ 5919715ms] ReferenceError: FloorPlan is not defined
+    at App (http://localhost:5173/src/App.tsx?t=1773852864431:170:11)
+    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:18241:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:5386:24)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:7207:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:8257:20)
+    at runWithFiberInDEV (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:729:72)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:12293:98)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:12156:43)
+    at renderRootSync (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:12140:13)
+    at performWorkOnRoot (http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:11559:37)
+[ 5919716ms] [WARNING] %s
+
+%s
+ An error occurred in the <App> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/chunk-A7TE6BYH.js?v=a8279d00:6697

@@ -1,0 +1,155 @@
+- generic [ref=e3]:
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - heading "La Maison" [level=1] [ref=e6]
+      - paragraph [ref=e7]: Restorani laudade broneerimine
+    - navigation [ref=e9]:
+      - button "Broneerimine" [active] [ref=e10] [cursor=pointer]
+      - button "⚙ Admin" [ref=e11] [cursor=pointer]
+  - main [ref=e12]:
+    - complementary [ref=e243]:
+      - generic [ref=e244]:
+        - heading "Otsi lauda" [level=2] [ref=e245]
+        - generic [ref=e246]:
+          - generic [ref=e247]:
+            - generic [ref=e248]: Kuupaev
+            - textbox [ref=e249]: 2026-03-18
+          - generic [ref=e250]:
+            - generic [ref=e251]: Kellaaeg
+            - textbox [ref=e252]: 16:30
+          - generic [ref=e253]:
+            - generic [ref=e254]: Seltskonna suurus
+            - spinbutton [ref=e255]: "2"
+          - generic [ref=e256]: Maksimaalne seltskond on 20 inimest
+          - generic [ref=e257]:
+            - generic [ref=e258]: Tsoon
+            - combobox [ref=e259]:
+              - option "Koik tsoonid" [selected]
+              - option "Sisesaal"
+              - option "Terrass"
+              - option "Privaatruum"
+        - generic [ref=e260]:
+          - heading "Eelistused" [level=3] [ref=e261]
+          - generic [ref=e262]:
+            - generic [ref=e263] [cursor=pointer]:
+              - checkbox "Akna all" [ref=e264]
+              - text: Akna all
+            - generic [ref=e265] [cursor=pointer]:
+              - checkbox "Privaatne nurk" [ref=e266]
+              - text: Privaatne nurk
+            - generic [ref=e267] [cursor=pointer]:
+              - checkbox "Mangunurga lahedal" [ref=e268]
+              - text: Mangunurga lahedal
+            - generic [ref=e269] [cursor=pointer]:
+              - checkbox "Ligipaasetav" [ref=e270]
+              - text: Ligipaasetav
+            - generic [ref=e271] [cursor=pointer]:
+              - checkbox "Lava lahedal 🎵" [ref=e272]
+              - text: Lava lahedal 🎵
+        - button "Otsi vabu laudu" [ref=e273] [cursor=pointer]
+    - generic [ref=e275]:
+      - heading "Saali plaan" [level=2] [ref=e276]
+      - generic [ref=e277]:
+        - generic [ref=e278]: Vaba
+        - generic [ref=e280]: Hoivatud
+        - generic [ref=e282]: Soovitatud
+        - generic [ref=e284]: Valitud
+        - generic [ref=e286]: "|"
+        - generic [ref=e287]: Laua number / istekohta
+      - generic [ref=e288]:
+        - generic:
+          - generic: Sisesaal
+        - generic:
+          - generic: Terrass
+        - generic:
+          - generic: Privaatruumid
+        - generic "🎵 LAVA"
+        - generic "BAAR"
+        - generic "KÖKK"
+        - generic "🧸"
+        - generic "Vaade tänavale":
+          - generic: Vaade tänavale
+        - generic "Vaade sisehoovi":
+          - generic: Vaade sisehoovi
+        - generic "Vaade terrassile":
+          - generic: Vaade terrassile
+        - generic "→ Välisuks":
+          - generic: → Välisuks
+        - generic "Uks terrassile →":
+          - generic: Uks terrassile →
+        - generic "💰 Kassa":
+          - generic: 💰 Kassa
+        - generic "🚻 WC":
+          - generic: 🚻 WC
+        - generic "Laud 1 | 2 kohta | Sisesaal" [ref=e289]:
+          - generic [ref=e290]: "1"
+          - generic "2 istekohta" [ref=e291]: "2"
+        - generic "Laud 2 | 2 kohta | Sisesaal" [ref=e292] [cursor=pointer]:
+          - generic [ref=e293]: "2"
+          - generic "2 istekohta" [ref=e294]: "2"
+        - generic "Laud 3 | 4 kohta | Sisesaal" [ref=e295] [cursor=pointer]:
+          - generic [ref=e296]: "3"
+          - generic "4 istekohta" [ref=e297]: "4"
+        - generic "Laud 4 | 2 kohta | Sisesaal" [ref=e298] [cursor=pointer]:
+          - generic [ref=e299]: "4"
+          - generic "2 istekohta" [ref=e300]: "2"
+        - generic "Laud 5 | 6 kohta | Sisesaal" [ref=e301] [cursor=pointer]:
+          - generic [ref=e302]: "5"
+          - generic "6 istekohta" [ref=e303]: "6"
+        - generic "Laud 6 | 6 kohta | Sisesaal" [ref=e304]:
+          - generic [ref=e305]: "6"
+          - generic "6 istekohta" [ref=e306]: "6"
+        - generic "Laud 7 | 4 kohta | Sisesaal" [ref=e307] [cursor=pointer]:
+          - generic [ref=e308]: "7"
+          - generic "4 istekohta" [ref=e309]: "4"
+        - generic "Laud 8 | 2 kohta | Sisesaal" [ref=e310] [cursor=pointer]:
+          - generic [ref=e311]: "8"
+          - generic "2 istekohta" [ref=e312]: "2"
+        - generic "Laud 9 | 4 kohta | Sisesaal" [ref=e313]:
+          - generic [ref=e314]: "9"
+          - generic "4 istekohta" [ref=e315]: "4"
+        - generic "Laud 10 | 8 kohta | Sisesaal" [ref=e316] [cursor=pointer]:
+          - generic [ref=e317]: "10"
+          - generic "8 istekohta" [ref=e318]: "8"
+        - generic "Laud 11 | 2 kohta | Terrass" [ref=e319] [cursor=pointer]:
+          - generic [ref=e320]: "11"
+          - generic "2 istekohta" [ref=e321]: "2"
+        - generic "Laud 12 | 4 kohta | Terrass" [ref=e322] [cursor=pointer]:
+          - generic [ref=e323]: "12"
+          - generic "4 istekohta" [ref=e324]: "4"
+        - generic "Laud 13 | 4 kohta | Terrass" [ref=e325] [cursor=pointer]:
+          - generic [ref=e326]: "13"
+          - generic "4 istekohta" [ref=e327]: "4"
+        - generic "Laud 14 | 6 kohta | Terrass" [ref=e328] [cursor=pointer]:
+          - generic [ref=e329]: "14"
+          - generic "6 istekohta" [ref=e330]: "6"
+        - generic "Laud 15 | 6 kohta | Terrass" [ref=e331] [cursor=pointer]:
+          - generic [ref=e332]: "15"
+          - generic "6 istekohta" [ref=e333]: "6"
+        - generic "Laud 16 | 2 kohta | Terrass" [ref=e334] [cursor=pointer]:
+          - generic [ref=e335]: "16"
+          - generic "2 istekohta" [ref=e336]: "2"
+        - generic "Laud 17 | 4 kohta | Privaatruum" [ref=e337]:
+          - generic [ref=e338]: "17"
+          - generic "4 istekohta" [ref=e339]: "4"
+        - generic "Laud 18 | 6 kohta | Privaatruum" [ref=e340] [cursor=pointer]:
+          - generic [ref=e341]: "18"
+          - generic "6 istekohta" [ref=e342]: "6"
+        - generic "Laud 19 | 8 kohta | Privaatruum" [ref=e343] [cursor=pointer]:
+          - generic [ref=e344]: "19"
+          - generic "8 istekohta" [ref=e345]: "8"
+        - generic "Laud 20 | 12 kohta | Privaatruum" [ref=e346] [cursor=pointer]:
+          - generic [ref=e347]: "20"
+          - generic "12 istekohta" [ref=e348]: "12"
+        - generic "Laud 21 | 2 kohta | Privaatruum" [ref=e349] [cursor=pointer]:
+          - generic [ref=e350]: "21"
+          - generic "2 istekohta" [ref=e351]: "2"
+        - generic "Laud 22 | 2 kohta | Privaatruum" [ref=e352] [cursor=pointer]:
+          - generic [ref=e353]: "22"
+          - generic "2 istekohta" [ref=e354]: "2"
+        - generic "Laud 23 | 4 kohta | Privaatruum" [ref=e355] [cursor=pointer]:
+          - generic [ref=e356]: "23"
+          - generic "4 istekohta" [ref=e357]: "4"
+        - generic "Laud 24 | 4 kohta | Privaatruum" [ref=e358] [cursor=pointer]:
+          - generic [ref=e359]: "24"
+          - generic "4 istekohta" [ref=e360]: "4"

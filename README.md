@@ -37,6 +37,7 @@ A full-stack restaurant reservation app with an **interactive floor plan**, **sc
 ### Guest View
 
 - **Visual floor plan** — three zones: Main Hall, Terrace, Private Rooms
+- **2D ⇄ 3D toggle** — switch between classic 2D floor plan and interactive Three.js 3D view with orbital camera
 - **Smart filters** — date, time, party size, zone
 - **Preference matching** — window seat, private corner, near playground, accessible, near stage
 - **Table recommendations** — score-based ranking (max 102 pts) considering size fit + preferences
@@ -51,6 +52,7 @@ A full-stack restaurant reservation app with an **interactive floor plan**, **sc
 - **Floor elements** — bar, kitchen, stage, door, window, playground
 - **Resize & rotate** — corner handle for resizing, top handle for rotation
 - **Edit panel** — modify element name, dimensions, and rotation angle
+- **3D preview** — toggle to Three.js 3D view to see how the layout looks from a guest's perspective
 
 ---
 
@@ -61,7 +63,10 @@ A full-stack restaurant reservation app with an **interactive floor plan**, **sc
 | Backend | Spring Boot 3.5.11, Java 21, JPA, Lombok |
 | Database | H2 (in-memory) |
 | Frontend | React 19, TypeScript, Vite 7 |
+| 3D Engine | Three.js, @react-three/fiber, @react-three/drei |
 | Styling | Custom CSS (light green/cream theme, responsive) |
+| Testing | JUnit 5, MockMvc, AssertJ |
+| Deployment | Docker (multi-stage build) |
 | Code Quality | SonarCloud — all A ratings, 0% duplication |
 
 ---
@@ -93,6 +98,14 @@ npm run dev
 Opens at `http://localhost:5173`
 
 That's it — the app seeds 24 tables and ~12–16 random reservations on startup.
+
+### Alternative: Docker
+
+```bash
+docker compose up --build
+```
+
+Opens at `http://localhost:8080` (backend serves the frontend build).
 
 ---
 
@@ -171,10 +184,18 @@ restaurant/
 │   └── service/         # Business logic (scoring, merging)
 └── frontend/src/
     ├── components/
-    │   ├── FilterPanel.tsx       # Search filters
-    │   ├── FloorPlan.tsx         # Guest floor plan view
-    │   ├── AdminFloorPlan.tsx    # Admin editor
-    │   └── ReservationModal.tsx  # Booking modal
+    │   ├── FloorPlanWrapper.tsx      # 2D ⇄ 3D toggle
+    │   ├── FloorPlan.tsx             # 2D guest floor plan
+    │   ├── FloorPlan3D.tsx           # Three.js 3D floor plan
+    │   ├── AdminFloorPlanWrapper.tsx  # Admin 2D + 3D preview
+    │   ├── AdminFloorPlan.tsx        # Admin 2D editor
+    │   ├── FilterPanel.tsx           # Search filters
+    │   ├── ReservationModal.tsx      # Booking modal
+    │   └── three/                    # 3D sub-components
+    │       ├── Room.tsx              # Walls, floors, ceiling, windows, doors
+    │       ├── Table3D.tsx           # 3D table with status colors
+    │       ├── Lighting.tsx          # Ambient, directional, window lights
+    │       └── Furniture.tsx         # Bar, stage, kitchen
     ├── api.ts           # API client
     └── types.ts         # TypeScript types
 ```

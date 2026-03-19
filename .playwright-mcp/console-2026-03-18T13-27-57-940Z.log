@@ -1,0 +1,16 @@
+[  238189ms] ReferenceError: getMovedPos is not defined
+    at http://localhost:5173/src/components/FloorPlan.tsx?t=1773840716066:211:22
+    at Array.map (<anonymous>)
+    at FloorPlan (http://localhost:5173/src/components/FloorPlan.tsx?t=1773840716066:210:23)
+    at Object.react_stack_bottom_frame (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:18507:20)
+    at renderWithHooks (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:5652:24)
+    at updateFunctionComponent (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:7473:21)
+    at beginWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:8523:20)
+    at runWithFiberInDEV (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:995:72)
+    at performUnitOfWork (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:12559:98)
+    at workLoopSync (http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:12422:43)
+[  238189ms] [WARNING] %s
+
+%s
+ An error occurred in the <FloorPlan> component. Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://react.dev/link/error-boundaries to learn more about error boundaries. @ http://localhost:5173/node_modules/.vite/deps/react-dom_client.js?v=07499e2d:6963
