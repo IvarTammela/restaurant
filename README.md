@@ -219,7 +219,7 @@ restaurant/
 
 ## Development Notes
 
-**Total time:** ~8 hours (one evening + morning)
+**Total time:** ~16 hours
 
 ### Challenges Solved
 
