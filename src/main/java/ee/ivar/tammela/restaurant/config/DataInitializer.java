@@ -21,6 +21,11 @@ import java.security.SecureRandom;
 @RequiredArgsConstructor
 public class DataInitializer implements CommandLineRunner {
 
+    private static final String ZONE_SISESAAL = "Sisesaal";
+    private static final String ZONE_TERRASS = "Terrass";
+    private static final String ZONE_PRIVAATRUUMID = "Privaatruumid";
+    private static final String ELEMENT_WINDOW = "window";
+
     private final TableRepository tableRepository;
     private final ReservationRepository reservationRepository;
     private final FloorElementRepository floorElementRepository;
@@ -36,57 +41,59 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void createRooms() {
-        roomRepository.save(Room.builder().name("Sisesaal").x(0).y(0).width(52).height(72).build());
-        roomRepository.save(Room.builder().name("Terrass").x(54).y(0).width(46).height(72).build());
-        roomRepository.save(Room.builder().name("Privaatruumid").x(0).y(74).width(100).height(26).build());
+        roomRepository.save(Room.builder().name(ZONE_SISESAAL).x(0).y(0).width(52).height(72).build());
+        roomRepository.save(Room.builder().name(ZONE_TERRASS).x(54).y(0).width(46).height(72).build());
+        roomRepository.save(Room.builder().name(ZONE_PRIVAATRUUMID).x(0).y(74).width(100).height(26).build());
     }
 
     private void createTables() {
         // Sisesaal - vasakpoolne sein (akna ääres)
-        saveTable(1, 2, 5, 25, "Sisesaal", true, false, false, true, false);
-        saveTable(2, 2, 5, 40, "Sisesaal", true, false, false, false, false);
-        saveTable(3, 4, 5, 55, "Sisesaal", true, false, false, false, false);
-        saveTable(4, 2, 18, 60, "Sisesaal", false, false, true, false, false);
+        saveTable(new TableParams(1, 2, 5, 25, ZONE_SISESAAL, true, false, false, true, false));
+        saveTable(new TableParams(2, 2, 5, 40, ZONE_SISESAAL, true, false, false, false, false));
+        saveTable(new TableParams(3, 4, 5, 55, ZONE_SISESAAL, true, false, false, false, false));
+        saveTable(new TableParams(4, 2, 18, 60, ZONE_SISESAAL, false, false, true, false, false));
         // Sisesaal - keskel
-        saveTable(5, 6, 22, 25, "Sisesaal", false, false, false, true, false);
-        saveTable(6, 6, 22, 45, "Sisesaal", false, false, false, true, false);
-        saveTable(7, 4, 35, 60, "Sisesaal", false, false, true, true, false);
+        saveTable(new TableParams(5, 6, 22, 25, ZONE_SISESAAL, false, false, false, true, false));
+        saveTable(new TableParams(6, 6, 22, 45, ZONE_SISESAAL, false, false, false, true, false));
+        saveTable(new TableParams(7, 4, 35, 60, ZONE_SISESAAL, false, false, true, true, false));
         // Sisesaal - parempoolne sein (akna ääres, lava lähedal)
-        saveTable(8, 2, 42, 20, "Sisesaal", true, false, false, false, true);
-        saveTable(9, 4, 42, 38, "Sisesaal", true, false, false, false, false);
-        saveTable(10, 8, 42, 58, "Sisesaal", false, false, true, true, true);
+        saveTable(new TableParams(8, 2, 42, 20, ZONE_SISESAAL, true, false, false, false, true));
+        saveTable(new TableParams(9, 4, 42, 38, ZONE_SISESAAL, true, false, false, false, false));
+        saveTable(new TableParams(10, 8, 42, 58, ZONE_SISESAAL, false, false, true, true, true));
 
         // Terrass - vasakpoolne rida
-        saveTable(11, 2, 62, 15, "Terrass", false, false, false, false, false);
-        saveTable(12, 4, 62, 35, "Terrass", false, false, false, true, false);
-        saveTable(13, 4, 62, 55, "Terrass", false, false, false, false, false);
+        saveTable(new TableParams(11, 2, 62, 15, ZONE_TERRASS, false, false, false, false, false));
+        saveTable(new TableParams(12, 4, 62, 35, ZONE_TERRASS, false, false, false, true, false));
+        saveTable(new TableParams(13, 4, 62, 55, ZONE_TERRASS, false, false, false, false, false));
         // Terrass - parempoolne rida
-        saveTable(14, 6, 82, 20, "Terrass", false, false, false, false, false);
-        saveTable(15, 6, 82, 40, "Terrass", false, false, false, true, false);
-        saveTable(16, 2, 82, 58, "Terrass", false, false, false, false, false);
+        saveTable(new TableParams(14, 6, 82, 20, ZONE_TERRASS, false, false, false, false, false));
+        saveTable(new TableParams(15, 6, 82, 40, ZONE_TERRASS, false, false, false, true, false));
+        saveTable(new TableParams(16, 2, 82, 58, ZONE_TERRASS, false, false, false, false, false));
 
         // Privaatruumid - ülemine rida
-        saveTable(17, 4, 10, 85, "Privaatruumid", false, true, false, false, false);
-        saveTable(18, 6, 25, 85, "Privaatruumid", false, true, false, false, false);
-        saveTable(19, 8, 42, 85, "Privaatruumid", false, true, false, true, false);
-        saveTable(20, 10, 58, 85, "Privaatruumid", false, true, false, true, false);
+        saveTable(new TableParams(17, 4, 10, 85, ZONE_PRIVAATRUUMID, false, true, false, false, false));
+        saveTable(new TableParams(18, 6, 25, 85, ZONE_PRIVAATRUUMID, false, true, false, false, false));
+        saveTable(new TableParams(19, 8, 42, 85, ZONE_PRIVAATRUUMID, false, true, false, true, false));
+        saveTable(new TableParams(20, 10, 58, 85, ZONE_PRIVAATRUUMID, false, true, false, true, false));
         // Privaatruumid - parempoolne osa
-        saveTable(21, 2, 72, 82, "Privaatruumid", false, true, false, false, false);
-        saveTable(22, 2, 82, 82, "Privaatruumid", false, true, false, false, false);
-        saveTable(23, 4, 72, 92, "Privaatruumid", false, true, false, false, false);
-        saveTable(24, 4, 82, 92, "Privaatruumid", false, true, false, false, false);
+        saveTable(new TableParams(21, 2, 72, 82, ZONE_PRIVAATRUUMID, false, true, false, false, false));
+        saveTable(new TableParams(22, 2, 82, 82, ZONE_PRIVAATRUUMID, false, true, false, false, false));
+        saveTable(new TableParams(23, 4, 72, 92, ZONE_PRIVAATRUUMID, false, true, false, false, false));
+        saveTable(new TableParams(24, 4, 82, 92, ZONE_PRIVAATRUUMID, false, true, false, false, false));
     }
 
-    private void saveTable(int number, int seats, double posX, double posY, String zone,
-                           boolean window, boolean priv, boolean playground,
-                           boolean accessible, boolean nearStage) {
+    private void saveTable(TableParams p) {
         tableRepository.save(RestaurantTable.builder()
-                .tableNumber(number).seats(seats)
-                .posX(posX).posY(posY).zone(zone)
-                .windowSeat(window).privateArea(priv)
-                .nearPlayground(playground).accessible(accessible)
-                .nearStage(nearStage).build());
+                .tableNumber(p.number).seats(p.seats)
+                .posX(p.posX).posY(p.posY).zone(p.zone)
+                .windowSeat(p.window).privateArea(p.priv)
+                .nearPlayground(p.playground).accessible(p.accessible)
+                .nearStage(p.nearStage).build());
     }
+
+    private record TableParams(int number, int seats, double posX, double posY, String zone,
+                                boolean window, boolean priv, boolean playground,
+                                boolean accessible, boolean nearStage) {}
 
     private void createFloorElements() {
         //                          type          name              posX  posY  width height rotation
@@ -98,9 +105,9 @@ public class DataInitializer implements CommandLineRunner {
         floorElementRepository.save(new FloorElement("playground", "\uD83E\uDDF8",   96,  94,  4,   5,  0));
 
         // Aknad (window) — saali sees, seinte ääres
-        floorElementRepository.save(new FloorElement("window",     "Vaade t\u00E4navale",   1,   20,  1.5,  40,  0));
-        floorElementRepository.save(new FloorElement("window",     "Vaade sisehoovi",       51,  15,  1.5,  35,  0));
-        floorElementRepository.save(new FloorElement("window",     "Vaade terrassile",      97,  15,  1.5,  50,  0));
+        floorElementRepository.save(new FloorElement(ELEMENT_WINDOW, "Vaade t\u00E4navale",   1,   20,  1.5,  40,  0));
+        floorElementRepository.save(new FloorElement(ELEMENT_WINDOW, "Vaade sisehoovi",       51,  15,  1.5,  35,  0));
+        floorElementRepository.save(new FloorElement(ELEMENT_WINDOW, "Vaade terrassile",      97,  15,  1.5,  50,  0));
 
         // Uksed (door)
         floorElementRepository.save(new FloorElement("door",       "\u2192 V\u00E4lisuks",  24,  70,  4,   2,  0));
