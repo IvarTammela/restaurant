@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { RestaurantTable, Filters } from '../types';
 import { createReservation } from '../api';
 
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ReservationModal({ table, filters, onClose, onSuccess }: Props) {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,7 +19,7 @@ export default function ReservationModal({ table, filters, onClose, onSuccess }:
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) {
-      setError('Palun sisesta nimi');
+      setError(t('reservation.nameRequired'));
       return;
     }
 
@@ -34,18 +36,9 @@ export default function ReservationModal({ table, filters, onClose, onSuccess }:
       });
       onSuccess();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Broneerimine ebaonnestus');
+      setError(err instanceof Error ? err.message : t('reservation.failed'));
     } finally {
       setLoading(false);
-    }
-  }
-
-  function getZoneLabel(zone: string) {
-    switch (zone) {
-      case 'MAIN_HALL': return 'Sisesaal';
-      case 'TERRACE': return 'Terrass';
-      case 'PRIVATE_ROOM': return 'Privaatruum';
-      default: return zone;
     }
   }
 
@@ -54,49 +47,49 @@ export default function ReservationModal({ table, filters, onClose, onSuccess }:
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <button className="modal-close" onClick={onClose}>&times;</button>
 
-        <h2>Broneeri laud</h2>
+        <h2>{t('reservation.title')}</h2>
 
         <div className="modal-details">
           <div className="detail-row">
-            <span className="detail-label">Laud</span>
+            <span className="detail-label">{t('reservation.table')}</span>
             <span className="detail-value">#{table.tableNumber}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Kohti</span>
+            <span className="detail-label">{t('reservation.seats')}</span>
             <span className="detail-value">{table.seats}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Tsoon</span>
-            <span className="detail-value">{getZoneLabel(table.zone)}</span>
+            <span className="detail-label">{t('reservation.zone')}</span>
+            <span className="detail-value">{t(`zone.${table.zone}`)}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Kuupaev</span>
+            <span className="detail-label">{t('reservation.date')}</span>
             <span className="detail-value">{filters.date}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Kellaaeg</span>
+            <span className="detail-label">{t('reservation.time')}</span>
             <span className="detail-value">{filters.time} - {calculateEndTime(filters.time)}</span>
           </div>
           <div className="detail-row">
-            <span className="detail-label">Seltskond</span>
-            <span className="detail-value">{filters.partySize} inimest</span>
+            <span className="detail-label">{t('reservation.party')}</span>
+            <span className="detail-value">{t('reservation.people', { count: filters.partySize })}</span>
           </div>
           <div className="table-features">
-            {table.windowSeat && <span className="feature">Aknakoht</span>}
-            {table.privateArea && <span className="feature">Privaatne</span>}
-            {table.nearPlayground && <span className="feature">Mangunurk</span>}
-            {table.accessible && <span className="feature">Ligipaasetav</span>}
+            {table.windowSeat && <span className="feature">{t('reservation.windowSeat')}</span>}
+            {table.privateArea && <span className="feature">{t('reservation.private')}</span>}
+            {table.nearPlayground && <span className="feature">{t('reservation.playground')}</span>}
+            {table.accessible && <span className="feature">{t('reservation.accessible')}</span>}
           </div>
         </div>
 
         <form onSubmit={handleSubmit}>
           <div className="filter-group">
-            <label>Sinu nimi</label>
+            <label>{t('reservation.yourName')}</label>
             <input
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Sisesta nimi"
+              placeholder={t('reservation.namePlaceholder')}
               autoFocus
             />
           </div>
@@ -104,7 +97,7 @@ export default function ReservationModal({ table, filters, onClose, onSuccess }:
           {error && <div className="error-msg">{error}</div>}
 
           <button className="search-btn" type="submit" disabled={loading}>
-            {loading ? 'Broneerin...' : 'Kinnita broneering'}
+            {loading ? t('reservation.submitting') : t('reservation.submit')}
           </button>
         </form>
       </div>

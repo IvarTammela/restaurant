@@ -50,4 +50,10 @@ public class FloorElementController {
         repository.deleteById(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAll() {
+        repository.deleteAll();
+        return ResponseEntity.noContent().build();
+    }
 }

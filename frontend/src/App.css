@@ -883,6 +883,15 @@
 
 .modal-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
+.lang-btn {
+  margin-left: 1rem;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border) !important;
+  padding: 0.55rem 1rem;
+  font-weight: 500;
+  min-width: 2.8rem;
+}
+
 /* ===== Admin View ===== */
 .admin-view { max-width: 1100px; }
 
@@ -1230,9 +1239,70 @@
 .admin-rotation-control input[type="range"] { flex: 1; accent-color: var(--accent); }
 .admin-rotation-value { font-size: 0.72rem; color: var(--text-secondary); min-width: 35px; text-align: right; }
 
+/* ===== Admin Walls SVG ===== */
+.admin-walls-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.admin-wall {
+  transition: filter 0.2s;
+}
+
+.admin-wall-selected {
+  filter: drop-shadow(0 0 4px rgba(212,169,74,0.8)) drop-shadow(0 0 8px rgba(212,169,74,0.4));
+}
+
+.admin-color-input {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+/* ===== Floor Plan Walls (booking view) ===== */
+.floor-plan-walls {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: visible;
+}
+
 /* ===== Cursors ===== */
 .cursor-crosshair { cursor: crosshair !important; }
 .cursor-cell { cursor: cell !important; }
+
+/* ===== Upload Modal ===== */
+.upload-modal { max-width: 520px; }
+.upload-hint { color: var(--text-muted); font-size: 0.75rem; margin-bottom: 1rem; letter-spacing: 1px; }
+.upload-zone {
+  border: 2px dashed var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.2s;
+  margin-bottom: 1rem;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.upload-zone:hover { border-color: var(--accent); }
+.upload-placeholder { color: var(--text-muted); font-size: 0.8rem; letter-spacing: 1px; }
+.upload-preview { max-width: 100%; max-height: 300px; border-radius: var(--radius); }
+.upload-status { color: var(--accent); font-size: 0.75rem; margin-bottom: 0.8rem; letter-spacing: 1px; }
 
 /* ===== Responsive ===== */
 @media (max-width: 900px) {

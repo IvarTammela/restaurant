@@ -22,8 +22,7 @@ public class RestaurantTable {
     private double posX;
     private double posY;
 
-    @Enumerated(EnumType.STRING)
-    private Zone zone;
+    private String zone;
 
     private boolean windowSeat;
     private boolean privateArea;

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
-import type { Filters, FloorElement, Reservation, RestaurantTable, TableRecommendation } from './types';
-import { fetchAllTables, fetchElements, fetchRecommendations, fetchReservations } from './api';
+import { useTranslation } from 'react-i18next';
+import type { Filters, FloorElement, Reservation, RestaurantTable, TableRecommendation, Wall } from './types';
+import { fetchAllTables, fetchElements, fetchRecommendations, fetchReservations, fetchRooms, fetchWalls } from './api';
+import type { RoomDTO } from './api';
 import FilterPanel from './components/FilterPanel';
 import FloorPlanWrapper from './components/FloorPlanWrapper';
 import AdminFloorPlanWrapper from './components/AdminFloorPlanWrapper';
@@ -17,11 +19,14 @@ function calcMaxPartySize(tables: RestaurantTable[]): number {
 }
 
 function App() {
+  const { t, i18n } = useTranslation();
   const [activeTab, setActiveTab] = useState<'booking' | 'admin'>('booking');
   const [tables, setTables] = useState<RestaurantTable[]>([]);
   const [recommendations, setRecommendations] = useState<TableRecommendation[]>([]);
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [floorElements, setFloorElements] = useState<FloorElement[]>([]);
+  const [walls, setWalls] = useState<Wall[]>([]);
+  const [rooms, setRooms] = useState<RoomDTO[]>([]);
   const [selectedTable, setSelectedTable] = useState<RestaurantTable | null>(null);
   const [showModal, setShowModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState('');
@@ -40,10 +45,14 @@ function App() {
 
   const refreshTables = () => fetchAllTables().then(setTables);
   const refreshElements = () => fetchElements().then(setFloorElements);
+  const refreshWalls = () => fetchWalls().then(setWalls);
+  const refreshRooms = () => fetchRooms().then(setRooms);
 
   useEffect(() => {
     refreshTables();
     refreshElements();
+    refreshWalls();
+    refreshRooms();
     fetchReservations().then(setReservations);
   }, []);
 
@@ -63,7 +72,7 @@ function App() {
   async function handleReservationSuccess() {
     setShowModal(false);
     setSelectedTable(null);
-    setSuccessMsg(`Laud #${selectedTable?.tableNumber} edukalt broneeritud!`);
+    setSuccessMsg(t('reservation.success', { number: selectedTable?.tableNumber }));
     const [newReservations] = await Promise.all([
       fetchReservations(),
     ]);
@@ -72,27 +81,45 @@ function App() {
     setRecommendations(recs);
   }
 
+  function toggleLanguage() {
+    i18n.changeLanguage(i18n.language === 'et' ? 'en' : 'et');
+  }
+
+  // Refresh rooms when switching back from admin tab
+  function handleTabChange(tab: 'booking' | 'admin') {
+    setActiveTab(tab);
+    if (tab === 'booking') {
+      refreshRooms();
+      refreshTables();
+      refreshElements();
+      refreshWalls();
+    }
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <div className="header-brand">
-          <h1>La Maison</h1>
-          <p className="subtitle">Restorani laudade broneerimine</p>
+          <h1>{t('app.title')}</h1>
+          <p className="subtitle">{t('app.subtitle')}</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          {activeTab === 'admin' && <div className="admin-badge">ADMIN MODE</div>}
+          {activeTab === 'admin' && <div className="admin-badge">{t('app.adminMode')}</div>}
           <nav className="app-nav">
             <button
               className={`nav-tab ${activeTab === 'booking' ? 'active' : ''}`}
-              onClick={() => setActiveTab('booking')}
+              onClick={() => handleTabChange('booking')}
             >
-              Broneerimine
+              {t('app.booking')}
             </button>
             <button
               className={`nav-tab ${activeTab === 'admin' ? 'active' : ''}`}
-              onClick={() => setActiveTab('admin')}
+              onClick={() => handleTabChange('admin')}
             >
-              &#9881; Admin
+              &#9881; {t('app.admin')}
+            </button>
+            <button className="nav-tab lang-btn" onClick={toggleLanguage}>
+              {i18n.language === 'et' ? 'EN' : 'ET'}
             </button>
           </nav>
         </div>
@@ -107,6 +134,7 @@ function App() {
                 onChange={setFilters}
                 onSearch={handleSearch}
                 maxPartySize={calcMaxPartySize(tables)}
+                rooms={rooms}
               />
             </aside>
             <section className="content">
@@ -116,6 +144,8 @@ function App() {
                 recommendations={recommendations}
                 reservations={reservations}
                 floorElements={floorElements}
+                walls={walls}
+                rooms={rooms}
                 selectedTable={selectedTable}
                 filterDate={filters.date}
                 filterTime={filters.time}
@@ -125,7 +155,7 @@ function App() {
           </>
         ) : (
           <section className="content">
-            <AdminFloorPlanWrapper tables={tables} floorElements={floorElements} onTablesChange={refreshTables} onElementsChange={refreshElements} />
+            <AdminFloorPlanWrapper tables={tables} floorElements={floorElements} walls={walls} onTablesChange={refreshTables} onElementsChange={refreshElements} onWallsChange={refreshWalls} />
           </section>
         )}
       </main>

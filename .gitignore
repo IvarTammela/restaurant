@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Claude Code ###
+.claude/
+
+### Maven duplicate ###
+.mvn/.mvn/
+
+### Environment ###
+frontend/.env
+frontend/.env.local

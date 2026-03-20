@@ -1,29 +1,26 @@
-import type { Filters, Zone } from '../types';
+import { useTranslation } from 'react-i18next';
+import type { Filters } from '../types';
+import type { RoomDTO } from '../api';
 
 interface Props {
   filters: Filters;
   onChange: (filters: Filters) => void;
   onSearch: () => void;
   maxPartySize: number;
+  rooms: RoomDTO[];
 }
 
-const zones: { value: Zone | ''; label: string }[] = [
-  { value: '', label: 'Koik tsoonid' },
-  { value: 'MAIN_HALL', label: 'Sisesaal' },
-  { value: 'TERRACE', label: 'Terrass' },
-  { value: 'PRIVATE_ROOM', label: 'Privaatruum' },
-];
-
-export default function FilterPanel({ filters, onChange, onSearch, maxPartySize }: Props) {
+export default function FilterPanel({ filters, onChange, onSearch, maxPartySize, rooms }: Props) {
+  const { t } = useTranslation();
   const update = (field: Partial<Filters>) => onChange({ ...filters, ...field });
 
   return (
     <div className="filter-panel">
-      <h2>Otsi lauda</h2>
+      <h2>{t('filter.searchTitle')}</h2>
 
       <div className="filter-grid">
         <div className="filter-group">
-          <label>Kuupaev</label>
+          <label>{t('filter.date')}</label>
           <input
             type="date"
             value={filters.date}
@@ -32,7 +29,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
         </div>
 
         <div className="filter-group">
-          <label>Kellaaeg</label>
+          <label>{t('filter.time')}</label>
           <input
             type="time"
             value={filters.time}
@@ -41,7 +38,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
         </div>
 
         <div className="filter-group">
-          <label>Seltskonna suurus</label>
+          <label>{t('filter.partySize')}</label>
           <input
             type="number"
             min={1}
@@ -51,24 +48,25 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
         </div>
         {maxPartySize > 0 && (
           <div className="max-party-info">
-            Maksimaalne seltskond on {maxPartySize} inimest
+            {t('filter.maxParty', { max: maxPartySize })}
           </div>
         )}
         {filters.partySize > 10 && (
           <div className="large-group-info">
-            Suure seltskonna jaoks otsime sobivaid laudade kombinatsioone
+            {t('filter.largeGroup')}
           </div>
         )}
 
         <div className="filter-group">
-          <label>Tsoon</label>
+          <label>{t('filter.zone')}</label>
           <select
             value={filters.zone}
-            onChange={(e) => update({ zone: e.target.value as Zone | '' })}
+            onChange={(e) => update({ zone: e.target.value })}
           >
-            {zones.map((z) => (
-              <option key={z.value} value={z.value}>
-                {z.label}
+            <option value="">{t('filter.allZones')}</option>
+            {rooms.map((r) => (
+              <option key={r.id} value={r.name}>
+                {r.name}
               </option>
             ))}
           </select>
@@ -76,7 +74,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
       </div>
 
       <div className="preferences">
-        <h3>Eelistused</h3>
+        <h3>{t('filter.preferences')}</h3>
         <div className="pref-grid">
           <label className="checkbox-label">
             <input
@@ -85,7 +83,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
               onChange={(e) => update({ windowSeat: e.target.checked })}
             />
             <span className="checkmark"></span>
-            Akna all
+            {t('filter.windowSeat')}
           </label>
           <label className="checkbox-label">
             <input
@@ -94,7 +92,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
               onChange={(e) => update({ privateArea: e.target.checked })}
             />
             <span className="checkmark"></span>
-            Privaatne nurk
+            {t('filter.privateArea')}
           </label>
           <label className="checkbox-label">
             <input
@@ -103,7 +101,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
               onChange={(e) => update({ nearPlayground: e.target.checked })}
             />
             <span className="checkmark"></span>
-            Mangunurga lahedal
+            {t('filter.nearPlayground')}
           </label>
           <label className="checkbox-label">
             <input
@@ -112,7 +110,7 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
               onChange={(e) => update({ accessible: e.target.checked })}
             />
             <span className="checkmark"></span>
-            Ligipaasetav
+            {t('filter.accessible')}
           </label>
           <label className="checkbox-label">
             <input
@@ -121,13 +119,13 @@ export default function FilterPanel({ filters, onChange, onSearch, maxPartySize 
               onChange={(e) => update({ nearStage: e.target.checked })}
             />
             <span className="checkmark"></span>
-            Lava lahedal &#127925;
+            {t('filter.nearStage')} &#127925;
           </label>
         </div>
       </div>
 
       <button className="search-btn" onClick={onSearch}>
-        Otsi vabu laudu
+        {t('filter.searchBtn')}
       </button>
     </div>
   );

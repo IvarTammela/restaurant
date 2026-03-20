@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import AdminFloorPlan from './AdminFloorPlan';
 import FloorPlan3D from './FloorPlan3D';
-import type { RestaurantTable, FloorElement } from '../types';
+import type { RestaurantTable, FloorElement, Wall } from '../types';
 
 interface Props {
   tables: RestaurantTable[];
   floorElements: FloorElement[];
+  walls: Wall[];
   onTablesChange: () => void;
   onElementsChange: () => void;
+  onWallsChange: () => void;
 }
 
 export default function AdminFloorPlanWrapper(props: Props) {

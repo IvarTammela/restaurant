@@ -4,7 +4,6 @@ import ee.ivar.tammela.restaurant.dto.Preferences;
 import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.Reservation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
-import ee.ivar.tammela.restaurant.model.Zone;
 import ee.ivar.tammela.restaurant.repository.ReservationRepository;
 import ee.ivar.tammela.restaurant.repository.TableRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,13 +26,13 @@ public class ReservationService {
     private static final int DEFAULT_DURATION_HOURS = 2;
 
     public List<RestaurantTable> findAvailableTables(LocalDate date, LocalTime startTime,
-                                                     LocalTime endTime, Zone zone) {
+                                                     LocalTime endTime, String zone) {
         List<Reservation> overlapping = reservationRepository.findOverlapping(date, startTime, endTime);
         Set<Long> occupiedTableIds = overlapping.stream()
                 .map(r -> r.getTable().getId())
                 .collect(Collectors.toSet());
 
-        List<RestaurantTable> allTables = (zone != null)
+        List<RestaurantTable> allTables = (zone != null && !zone.isEmpty())
                 ? tableRepository.findByZone(zone)
                 : tableRepository.findAll();
 
@@ -44,7 +43,7 @@ public class ReservationService {
 
     public List<TableRecommendation> recommendTables(LocalDate date, LocalTime startTime,
                                                       LocalTime endTime, int partySize,
-                                                      Zone zone, Preferences prefs) {
+                                                      String zone, Preferences prefs) {
         List<RestaurantTable> available = findAvailableTables(date, startTime, endTime, zone);
         return recommendationService.recommend(available, partySize, prefs);
     }

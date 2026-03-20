@@ -1,6 +1,5 @@
 package ee.ivar.tammela.restaurant.dto;
 
-import ee.ivar.tammela.restaurant.model.Zone;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ public class TableDTO {
     private int seats;
     private double posX;
     private double posY;
-    private Zone zone;
+    private String zone;
     private boolean windowSeat;
     private boolean privateArea;
     private boolean nearPlayground;

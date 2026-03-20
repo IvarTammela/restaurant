@@ -4,7 +4,6 @@ import ee.ivar.tammela.restaurant.dto.Preferences;
 import ee.ivar.tammela.restaurant.dto.TableDTO;
 import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
-import ee.ivar.tammela.restaurant.model.Zone;
 import ee.ivar.tammela.restaurant.repository.ReservationRepository;
 import ee.ivar.tammela.restaurant.repository.TableRepository;
 import ee.ivar.tammela.restaurant.service.ReservationService;
@@ -40,7 +39,7 @@ public class TableController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time,
             @RequestParam(defaultValue = "1") int partySize,
-            @RequestParam(required = false) Zone zone,
+            @RequestParam(required = false) String zone,
             @RequestParam(defaultValue = "false") boolean windowSeat,
             @RequestParam(defaultValue = "false") boolean privateArea,
             @RequestParam(defaultValue = "false") boolean nearPlayground,
@@ -59,7 +58,7 @@ public class TableController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.TIME) LocalTime time,
             @RequestParam(defaultValue = "1") int partySize,
-            @RequestParam(required = false) Zone zone,
+            @RequestParam(required = false) String zone,
             @RequestParam(defaultValue = "false") boolean windowSeat,
             @RequestParam(defaultValue = "false") boolean privateArea,
             @RequestParam(defaultValue = "false") boolean nearPlayground,
@@ -92,7 +91,7 @@ public class TableController {
         RestaurantTable table = tableRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Table not found"));
         if (updates.containsKey("seats")) table.setSeats((Integer) updates.get("seats"));
-        if (updates.containsKey("zone")) table.setZone(Zone.valueOf((String) updates.get("zone")));
+        if (updates.containsKey("zone")) table.setZone((String) updates.get("zone"));
         if (updates.containsKey("tableNumber")) table.setTableNumber((Integer) updates.get("tableNumber"));
         if (updates.containsKey("windowSeat")) table.setWindowSeat((Boolean) updates.get("windowSeat"));
         if (updates.containsKey("privateArea")) table.setPrivateArea((Boolean) updates.get("privateArea"));
@@ -124,6 +123,14 @@ public class TableController {
     public ResponseEntity<Void> deleteTable(@PathVariable Long id) {
         reservationRepository.deleteByTableId(id);
         tableRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    @Transactional
+    public ResponseEntity<Void> deleteAllTables() {
+        reservationRepository.deleteAll();
+        tableRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
 }

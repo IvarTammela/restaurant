@@ -1,14 +1,17 @@
 import { useRef, useState, useEffect, useCallback } from 'react';
-import type { RestaurantTable, FloorElement, Zone } from '../types';
+import { useTranslation } from 'react-i18next';
+import type { RestaurantTable, FloorElement, Wall } from '../types';
 import {
   updateTablePosition, createNewTable, updateTable, deleteTable as apiDeleteTable,
   fetchRooms, createElement as apiCreateElement, updateElement as apiUpdateElement,
-  deleteElement as apiDeleteElement,
+  deleteElement as apiDeleteElement, createRoom as apiCreateRoom, deleteRoom as apiDeleteRoom,
+  deleteAllTables, deleteAllElements, deleteAllRooms,
+  createWall as apiCreateWall, deleteWall as apiDeleteWall, deleteAllWalls,
 } from '../api';
 import type { RoomDTO } from '../api';
 
 interface Room {
-  id: string;
+  id: number;
   name: string;
   x: number;
   y: number;
@@ -16,33 +19,37 @@ interface Room {
   h: number;
 }
 
-type Tool = 'idle' | 'add-room' | 'add-table' | 'add-element';
+type Tool = 'idle' | 'add-room' | 'add-table' | 'add-element' | 'add-wall';
 
-const ELEMENT_TYPES = [
-  { value: 'bar', label: 'Baar', icon: 'BAAR' },
-  { value: 'kitchen', label: 'K\u00f6\u00f6k', icon: 'K\u00d6KK' },
-  { value: 'stage', label: 'Lava', icon: '\u{1F3B5} LAVA' },
-  { value: 'door', label: 'Uks', icon: '\u2191' },
-  { value: 'window', label: 'Aken', icon: '\u25AF' },
-  { value: 'playground', label: 'M\u00e4ngunurk', icon: '\u{1F9F8}' },
-];
+const ELEMENT_TYPE_KEYS = ['bar', 'kitchen', 'stage', 'door', 'window', 'playground'] as const;
+const ELEMENT_ICONS: Record<string, string> = {
+  bar: 'BAAR',
+  kitchen: 'KÖKK',
+  stage: '\u{1F3B5} LAVA',
+  door: '\u2191',
+  window: '\u25AF',
+  playground: '\u{1F9F8}',
+};
 
 const RESIZE_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'] as const;
 
 interface Props {
   tables: RestaurantTable[];
   floorElements: FloorElement[];
+  walls: Wall[];
   onTablesChange: () => void;
   onElementsChange: () => void;
+  onWallsChange: () => void;
 }
 
-export default function AdminFloorPlan({ tables, floorElements, onTablesChange, onElementsChange }: Props) {
+export default function AdminFloorPlan({ tables, floorElements, walls, onTablesChange, onElementsChange, onWallsChange }: Props) {
+  const { t } = useTranslation();
   const floorRef = useRef<HTMLDivElement>(null);
 
   const [tool, setTool] = useState<Tool>('idle');
   const [addSeats, setAddSeats] = useState(4);
   const [addShape, setAddShape] = useState<'square' | 'circle'>('square');
-  const [addZone, setAddZone] = useState<Zone>('MAIN_HALL');
+  const [addZone, setAddZone] = useState('');
   const [addElemType, setAddElemType] = useState('bar');
 
   const [rooms, setRooms] = useState<Room[]>([]);
@@ -56,6 +63,13 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
       setRooms(data.map(r => ({ id: r.id, name: r.name, x: r.x, y: r.y, w: r.w, h: r.h })));
     });
   }, []);
+
+  // Set default addZone when rooms load
+  useEffect(() => {
+    if (rooms.length > 0 && !addZone) {
+      setAddZone(rooms[0].name);
+    }
+  }, [rooms, addZone]);
 
   // --- Table drag state using refs (no stale closures) ---
   const dragTableRef = useRef<{ id: number; startX: number; startY: number; offsetX: number; offsetY: number } | null>(null);
@@ -82,19 +96,20 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
   const [drawStart, setDrawStart] = useState<{ x: number; y: number } | null>(null);
   const [drawEnd, setDrawEnd] = useState<{ x: number; y: number } | null>(null);
-  const [namingRoom, setNamingRoom] = useState<Room | null>(null);
+  const [namingRoom, setNamingRoom] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   const [newRoomName, setNewRoomName] = useState('');
 
   const [editingTable, setEditingTable] = useState<RestaurantTable | null>(null);
   const [editingElement, setEditingElement] = useState<FloorElement | null>(null);
-  const [editingRoomId, setEditingRoomId] = useState<string | null>(null);
+  const [editingRoomId, setEditingRoomId] = useState<number | null>(null);
   const [editingRoomName, setEditingRoomName] = useState('');
 
   const [saveMsg, setSaveMsg] = useState('');
 
+
   // Table edit fields
   const [editSeats, setEditSeats] = useState(0);
-  const [editZone, setEditZone] = useState<Zone>('MAIN_HALL');
+  const [editZone, setEditZone] = useState('');
   const [editWindow, setEditWindow] = useState(false);
   const [editPrivate, setEditPrivate] = useState(false);
   const [editPlayground, setEditPlayground] = useState(false);
@@ -106,6 +121,13 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   const [editElemWidth, setEditElemWidth] = useState(0);
   const [editElemHeight, setEditElemHeight] = useState(0);
   const [editElemRotation, setEditElemRotation] = useState(0);
+
+  // Wall state
+  const [wallStart, setWallStart] = useState<{ x: number; y: number } | null>(null);
+  const [wallPreviewEnd, setWallPreviewEnd] = useState<{ x: number; y: number } | null>(null);
+  const [wallColor, setWallColor] = useState('#888888');
+  const [wallThickness, setWallThickness] = useState(4);
+  const [selectedWallId, setSelectedWallId] = useState<number | null>(null);
 
   useEffect(() => { localStorage.setItem('admin_table_shapes', JSON.stringify(tableShapes)); }, [tableShapes]);
 
@@ -127,11 +149,18 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
         setResizeElemSize(null);
         rotateElemRef.current = null;
         setRotateElemAngle(null);
+        roomDragRef.current = null;
+        setWallStart(null);
+        setWallPreviewEnd(null);
+        setSelectedWallId(null);
+      }
+      if (e.key === 'Delete' && selectedWallId !== null) {
+        apiDeleteWall(selectedWallId).then(() => { setSelectedWallId(null); onWallsChange(); });
       }
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, []);
+  }, [selectedWallId, onWallsChange]);
 
   function toPercent(cx: number, cy: number) {
     if (!floorRef.current) return { x: 0, y: 0 };
@@ -143,7 +172,7 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   }
 
   function showSaved() {
-    setSaveMsg('Salvestatud \u2713');
+    setSaveMsg(t('admin.saved'));
     setTimeout(() => setSaveMsg(''), 2000);
   }
 
@@ -154,8 +183,8 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
     if (handle === 'ne' || handle === 'e' || handle === 'se') { w += dx; }
     if (handle === 'nw' || handle === 'n' || handle === 'ne') { y += dy; h -= dy; }
     if (handle === 'sw' || handle === 's' || handle === 'se') { h += dy; }
-    if (w < 3) { if (handle.includes('w')) x = orig.x + orig.w - 3; w = 3; }
-    if (h < 3) { if (handle.includes('n')) y = orig.y + orig.h - 3; h = 3; }
+    if (w < 0.5) { if (handle.includes('w')) x = orig.x + orig.w - 0.5; w = 0.5; }
+    if (h < 0.5) { if (handle.includes('n')) y = orig.y + orig.h - 0.5; h = 0.5; }
     return { ...orig, x: Math.max(0, x), y: Math.max(0, y), w, h };
   }
 
@@ -190,8 +219,8 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
       if (handle.includes('w')) { w -= dx; x += dx; }
       if (handle.includes('s')) h += dy;
       if (handle.includes('n')) { h -= dy; y += dy; }
-      w = Math.max(2, w);
-      h = Math.max(2, h);
+      w = Math.max(0.5, w);
+      h = Math.max(0.5, h);
       setResizeElemSize({ id: r.id, w, h, x: Math.max(0, x), y: Math.max(0, y) });
     }
 
@@ -202,6 +231,11 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
       let rotation = r.origRotation + (angle - r.startAngle);
       rotation = ((rotation % 360) + 360) % 360;
       setRotateElemAngle({ id: r.id, rotation });
+    }
+
+    // Room drag/resize (document-level so it works outside floor-plan bounds)
+    if (roomDragRef.current) {
+      setRoomMousePos({ x: pctX, y: pctY });
     }
   }, []);
 
@@ -266,6 +300,23 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
       await apiUpdateElement(id, { rotation });
       onElementsChange();
       showSaved();
+      return;
+    }
+
+    // Room drag/resize end (document-level)
+    if (roomDragRef.current) {
+      const drag = roomDragRef.current;
+      const dx = pctX - drag.mouseStartX;
+      const dy = pctY - drag.mouseStartY;
+      const moved = Math.abs(dx) > 1 || Math.abs(dy) > 1;
+      if (drag.kind === 'room-move' && moved) {
+        setRooms(p => p.map(r => r.id === drag.id ? { ...r, x: Math.max(0, drag.origX + dx), y: Math.max(0, drag.origY + dy) } : r));
+      }
+      if (drag.kind === 'room-resize' && drag.origRoom && moved) {
+        const updated = applyRoomResize(drag.origRoom, drag.handle!, dx, dy);
+        setRooms(p => p.map(r => r.id === drag.id ? updated : r));
+      }
+      setRoomDrag(null); roomDragRef.current = null; setRoomMousePos(null);
       return;
     }
   }, [tables, floorElements, onTablesChange, onElementsChange, resizeElemSize, rotateElemAngle]);
@@ -353,7 +404,7 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
   interface RoomDrag {
     kind: 'room-move' | 'room-resize';
-    id: string;
+    id: number;
     mouseStartX: number;
     mouseStartY: number;
     origX: number;
@@ -363,6 +414,7 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   }
   const [roomDrag, setRoomDrag] = useState<RoomDrag | null>(null);
   const [roomMousePos, setRoomMousePos] = useState<{ x: number; y: number } | null>(null);
+  const roomDragRef = useRef<RoomDrag | null>(null);
 
   function getRoomPos(room: Room) {
     if (!roomDrag || !roomMousePos) return room;
@@ -384,12 +436,28 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
     if (tool === 'add-room') { e.preventDefault(); setDrawStart(pos); setDrawEnd(null); return; }
     if (tool === 'add-table') { e.preventDefault(); addTable(pos.x, pos.y); return; }
     if (tool === 'add-element') { e.preventDefault(); handleAddElement(pos.x, pos.y); return; }
+    if (tool === 'add-wall') {
+      e.preventDefault();
+      if (!wallStart) {
+        setWallStart(pos);
+        setWallPreviewEnd(pos);
+      } else {
+        // Second click: create the wall
+        apiCreateWall({ x1: wallStart.x, y1: wallStart.y, x2: pos.x, y2: pos.y, color: wallColor, thickness: wallThickness })
+          .then(() => { onWallsChange(); });
+        setWallStart(null);
+        setWallPreviewEnd(null);
+      }
+      return;
+    }
+    // Deselect wall when clicking on empty space in idle mode
+    if (tool === 'idle') { setSelectedWallId(null); }
   }
 
   function handleMove(e: React.MouseEvent) {
     const pos = toPercent(e.clientX, e.clientY);
     if (tool === 'add-room' && drawStart) { setDrawEnd(pos); return; }
-    if (roomDrag) setRoomMousePos(pos);
+    if (tool === 'add-wall' && wallStart) { setWallPreviewEnd(pos); return; }
   }
 
   function handleUp() {
@@ -398,7 +466,7 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
       const y = Math.min(drawStart.y, drawEnd.y);
       const w = Math.abs(drawEnd.x - drawStart.x);
       const h = Math.abs(drawEnd.y - drawStart.y);
-      if (w > 2 && h > 2) { setNamingRoom({ id: Date.now().toString(), name: '', x, y, w, h }); setNewRoomName(''); }
+      if (w > 0.5 && h > 0.5) { setNamingRoom({ x, y, w, h }); setNewRoomName(''); }
       setDrawStart(null); setDrawEnd(null);
       return;
     }
@@ -415,14 +483,16 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
         setRooms(p => p.map(r => r.id === roomDrag.id ? updated : r));
       }
     }
-    setRoomDrag(null); setRoomMousePos(null);
+    setRoomDrag(null); roomDragRef.current = null; setRoomMousePos(null);
   }
 
-  function startRoomDrag(e: React.MouseEvent, kind: RoomDrag['kind'], id: string, ox: number, oy: number, extra?: Partial<RoomDrag>) {
+  function startRoomDrag(e: React.MouseEvent, kind: RoomDrag['kind'], id: number, ox: number, oy: number, extra?: Partial<RoomDrag>) {
     if (tool !== 'idle') return;
     e.preventDefault(); e.stopPropagation();
     const pos = toPercent(e.clientX, e.clientY);
-    setRoomDrag({ kind, id, mouseStartX: pos.x, mouseStartY: pos.y, origX: ox, origY: oy, ...extra });
+    const drag = { kind, id, mouseStartX: pos.x, mouseStartY: pos.y, origX: ox, origY: oy, ...extra };
+    setRoomDrag(drag);
+    roomDragRef.current = drag;
     setRoomMousePos(pos);
   }
 
@@ -430,28 +500,36 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
   async function addTable(px: number, py: number) {
     const maxN = tables.reduce((m, t) => Math.max(m, t.tableNumber), 0);
-    await createNewTable({ tableNumber: maxN + 1, seats: addSeats, zone: addZone, posX: px, posY: py });
+    const zone = addZone || rooms[0]?.name || 'Main';
+    await createNewTable({ tableNumber: maxN + 1, seats: addSeats, zone, posX: px, posY: py });
     setTool('idle');
     onTablesChange();
   }
 
   async function handleAddElement(px: number, py: number) {
-    const info = ELEMENT_TYPES.find(t => t.value === addElemType);
+    const icon = ELEMENT_ICONS[addElemType] ?? addElemType;
     await apiCreateElement({
-      type: addElemType, name: info?.icon ?? addElemType,
+      type: addElemType, name: icon,
       posX: px, posY: py, width: 8, height: 5, rotation: 0,
     });
     setTool('idle');
     onElementsChange();
   }
 
-  function saveNewRoom() {
+  async function saveNewRoom() {
     if (!namingRoom || !newRoomName.trim()) return;
-    setRooms(p => [...p, { ...namingRoom, name: newRoomName.trim() }]);
+    const saved = await apiCreateRoom({
+      name: newRoomName.trim(),
+      x: namingRoom.x, y: namingRoom.y, w: namingRoom.w, h: namingRoom.h,
+    });
+    setRooms(p => [...p, { id: saved.id, name: saved.name, x: saved.x, y: saved.y, w: saved.w, h: saved.h }]);
     setNamingRoom(null); setNewRoomName(''); setTool('idle');
   }
 
-  function deleteRoom(id: string) { setRooms(p => p.filter(r => r.id !== id)); }
+  async function handleDeleteRoom(id: number) {
+    await apiDeleteRoom(id);
+    setRooms(p => p.filter(r => r.id !== id));
+  }
 
   async function handleDeleteElement(e: React.MouseEvent, id: number) {
     e.stopPropagation(); e.preventDefault();
@@ -468,11 +546,11 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
     onTablesChange();
   }
 
-  function openTableEdit(t: RestaurantTable) {
+  function openTableEdit(table: RestaurantTable) {
     setEditingElement(null);
-    setEditingTable(t); setEditSeats(t.seats); setEditZone(t.zone as Zone);
-    setEditWindow(t.windowSeat); setEditPrivate(t.privateArea);
-    setEditPlayground(t.nearPlayground); setEditAccessible(t.accessible); setEditStage(t.nearStage);
+    setEditingTable(table); setEditSeats(table.seats); setEditZone(table.zone);
+    setEditWindow(table.windowSeat); setEditPrivate(table.privateArea);
+    setEditPlayground(table.nearPlayground); setEditAccessible(table.accessible); setEditStage(table.nearStage);
   }
 
   function openElemEdit(elem: FloorElement) {
@@ -504,12 +582,15 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
   }
 
   async function handleReset() {
-    if (!window.confirm('Kustuta k\u00f5ik lauad, ruumid ja elemendid?')) return;
-    setRooms([]); setTableShapes({});
-    setEditingTable(null); setEditingElement(null); setEditingRoomId(null);
-    for (const t of tables) await apiDeleteTable(t.id);
-    for (const e of floorElements) await apiDeleteElement(e.id);
-    onTablesChange(); onElementsChange();
+    if (!window.confirm(t('admin.resetConfirm'))) return;
+    setTableShapes({});
+    setEditingTable(null); setEditingElement(null); setEditingRoomId(null); setSelectedWallId(null);
+    await deleteAllTables();
+    await deleteAllElements();
+    await deleteAllRooms();
+    await deleteAllWalls();
+    setRooms([]);
+    onTablesChange(); onElementsChange(); onWallsChange();
   }
 
   // ========== DRAWING PREVIEW ==========
@@ -519,30 +600,28 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
     w: Math.abs(drawEnd.x - drawStart.x), h: Math.abs(drawEnd.y - drawStart.y),
   } : null;
 
-  const cursor = tool === 'add-room' ? 'cursor-crosshair' : tool !== 'idle' ? 'cursor-cell' : '';
+  const cursor = tool === 'add-room' ? 'cursor-crosshair' : tool === 'add-wall' ? 'cursor-crosshair' : tool !== 'idle' ? 'cursor-cell' : '';
 
   return (
     <div className="admin-view">
       <div className="admin-toolbar">
         <button className={`admin-tool-btn ${tool === 'add-room' ? 'active' : ''}`}
-          onClick={() => setTool(tool === 'add-room' ? 'idle' : 'add-room')}>+ Lisa ruum</button>
+          onClick={() => setTool(tool === 'add-room' ? 'idle' : 'add-room')}>{t('admin.addRoom')}</button>
 
         <div className="admin-tool-group">
           <button className={`admin-tool-btn ${tool === 'add-table' ? 'active' : ''}`}
-            onClick={() => setTool(tool === 'add-table' ? 'idle' : 'add-table')}>+ Lisa laud</button>
+            onClick={() => setTool(tool === 'add-table' ? 'idle' : 'add-table')}>{t('admin.addTable')}</button>
           {tool === 'add-table' && (
             <div className="admin-inline-form">
               <select value={addSeats} onChange={e => setAddSeats(+e.target.value)}>
-                {[2, 4, 6, 8, 10].map(n => <option key={n} value={n}>{n} kohta</option>)}
+                {[2, 4, 6, 8, 10].map(n => <option key={n} value={n}>{t('admin.seats', { count: n })}</option>)}
               </select>
               <select value={addShape} onChange={e => setAddShape(e.target.value as 'square' | 'circle')}>
-                <option value="square">&#9633; Ruut</option>
-                <option value="circle">&#9675; Ring</option>
+                <option value="square">&#9633; {t('admin.square')}</option>
+                <option value="circle">&#9675; {t('admin.circle')}</option>
               </select>
-              <select value={addZone} onChange={e => setAddZone(e.target.value as Zone)}>
-                <option value="MAIN_HALL">Sisesaal</option>
-                <option value="TERRACE">Terrass</option>
-                <option value="PRIVATE_ROOM">Privaatruum</option>
+              <select value={addZone} onChange={e => setAddZone(e.target.value)}>
+                {rooms.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
               </select>
             </div>
           )}
@@ -550,25 +629,42 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
         <div className="admin-tool-group">
           <button className={`admin-tool-btn ${tool === 'add-element' ? 'active' : ''}`}
-            onClick={() => setTool(tool === 'add-element' ? 'idle' : 'add-element')}>+ Lisa element</button>
+            onClick={() => setTool(tool === 'add-element' ? 'idle' : 'add-element')}>{t('admin.addElement')}</button>
           {tool === 'add-element' && (
             <div className="admin-inline-form">
               <select value={addElemType} onChange={e => setAddElemType(e.target.value)}>
-                {ELEMENT_TYPES.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
+                {ELEMENT_TYPE_KEYS.map(key => <option key={key} value={key}>{t(`elementType.${key}`)}</option>)}
               </select>
             </div>
           )}
         </div>
 
-        <button className="admin-tool-btn admin-reset-btn" onClick={handleReset}>🗑 Lähtesta</button>
+        <div className="admin-tool-group">
+          <button className={`admin-tool-btn ${tool === 'add-wall' ? 'active' : ''}`}
+            onClick={() => { setTool(tool === 'add-wall' ? 'idle' : 'add-wall'); setWallStart(null); setWallPreviewEnd(null); }}>{t('admin.addWall')}</button>
+          {tool === 'add-wall' && (
+            <div className="admin-inline-form">
+              <input type="color" value={wallColor} onChange={e => setWallColor(e.target.value)}
+                title={t('admin.wallColor')} className="admin-color-input" />
+              <select value={wallThickness} onChange={e => setWallThickness(+e.target.value)}>
+                <option value={2}>2px</option>
+                <option value={4}>4px</option>
+                <option value={6}>6px</option>
+              </select>
+            </div>
+          )}
+        </div>
+
+        <button className="admin-tool-btn admin-reset-btn" onClick={handleReset}>&#128465; {t('admin.reset')}</button>
 
         {saveMsg && <span className="admin-save-msg">{saveMsg}</span>}
 
         {tool !== 'idle' && (
           <span className="admin-hint">
-            {tool === 'add-room' && 'Lohista hiirt ruumi joonistamiseks \u00B7 ESC t\u00fchistab'}
-            {tool === 'add-table' && 'Kliki saaliplaanile laua paigutamiseks \u00B7 ESC t\u00fchistab'}
-            {tool === 'add-element' && 'Kliki saaliplaanile elemendi paigutamiseks \u00B7 ESC t\u00fchistab'}
+            {tool === 'add-room' && t('admin.hintRoom')}
+            {tool === 'add-table' && t('admin.hintTable')}
+            {tool === 'add-element' && t('admin.hintElement')}
+            {tool === 'add-wall' && t('admin.hintWall')}
           </span>
         )}
       </div>
@@ -598,10 +694,10 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
                     {room.name}
                   </span>
                 )}
-                <button className="admin-item-delete" onMouseDown={e => { e.stopPropagation(); deleteRoom(room.id); }}>&times;</button>
+                <button className="admin-item-delete" onMouseDown={e => { e.stopPropagation(); handleDeleteRoom(room.id); }}>&times;</button>
                 {RESIZE_HANDLES.map(h => (
                   <div key={h} className={`resize-handle rh-${h}`}
-                    onMouseDown={e => { e.preventDefault(); e.stopPropagation(); const pos = toPercent(e.clientX, e.clientY); setRoomDrag({ kind: 'room-resize', id: room.id, mouseStartX: pos.x, mouseStartY: pos.y, origX: 0, origY: 0, handle: h, origRoom: { ...room } }); setRoomMousePos(pos); }} />
+                    onMouseDown={e => { e.preventDefault(); e.stopPropagation(); const pos = toPercent(e.clientX, e.clientY); const drag = { kind: 'room-resize' as const, id: room.id, mouseStartX: pos.x, mouseStartY: pos.y, origX: 0, origY: 0, handle: h, origRoom: { ...room } }; setRoomDrag(drag); roomDragRef.current = drag; setRoomMousePos(pos); }} />
                 ))}
               </div>
             );
@@ -609,6 +705,40 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
 
           {/* Draw preview */}
           {drawRect && <div className="room-draw-preview" style={{ left: `${drawRect.x}%`, top: `${drawRect.y}%`, width: `${drawRect.w}%`, height: `${drawRect.h}%` }} />}
+
+          {/* Walls SVG overlay */}
+          <svg className="admin-walls-svg" aria-hidden="true">
+            {walls.map(wall => (
+              <g key={wall.id}>
+                {/* Wider invisible hit target */}
+                <line
+                  x1={`${wall.x1}%`} y1={`${wall.y1}%`}
+                  x2={`${wall.x2}%`} y2={`${wall.y2}%`}
+                  stroke="transparent" strokeWidth={8}
+                  style={{ cursor: 'pointer', pointerEvents: 'stroke' }}
+                  onMouseDown={e => { e.stopPropagation(); setSelectedWallId(wall.id); }}
+                />
+                <line
+                  x1={`${wall.x1}%`} y1={`${wall.y1}%`}
+                  x2={`${wall.x2}%`} y2={`${wall.y2}%`}
+                  stroke={wall.color} strokeWidth={wall.thickness}
+                  strokeLinecap="round"
+                  className={`admin-wall ${selectedWallId === wall.id ? 'admin-wall-selected' : ''}`}
+                  style={{ pointerEvents: 'none' }}
+                />
+              </g>
+            ))}
+            {/* Wall draw preview */}
+            {wallStart && wallPreviewEnd && (
+              <line
+                x1={`${wallStart.x}%`} y1={`${wallStart.y}%`}
+                x2={`${wallPreviewEnd.x}%`} y2={`${wallPreviewEnd.y}%`}
+                stroke={wallColor} strokeWidth={wallThickness}
+                strokeLinecap="round" strokeDasharray="6 4"
+                style={{ pointerEvents: 'none', opacity: 0.6 }}
+              />
+            )}
+          </svg>
 
           {/* Floor elements */}
           {floorElements.map(elem => {
@@ -624,11 +754,11 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
                 {/* Resize handle (SE corner) */}
                 <div className="elem-resize-handle"
                   onMouseDown={e => startElemResize(e, elem, 'se')}
-                  title="Muuda suurust" />
+                  title={t('admin.resizeTooltip')} />
                 {/* Rotation handle (top center) */}
                 <div className="elem-rotate-handle"
                   onMouseDown={e => startElemRotate(e, elem)}
-                  title="P\u00f6\u00f6ra">&#x21bb;</div>
+                  title={t('admin.rotateTooltip')}>&#x21bb;</div>
               </div>
             );
           })}
@@ -645,10 +775,10 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
                 className={`table-marker available admin-table ${sz} ${isDragging ? 'dragging' : ''} ${isEditing ? 'editing' : ''} ${shape === 'circle' ? 'shape-circle' : ''}`}
                 style={{ left: `${p.x}%`, top: `${p.y}%`, opacity: isDragging ? 0.7 : 1, transition: isDragging ? 'none' : undefined }}
                 onMouseDown={e => startTableDrag(e, table)}
-                title={`Laud ${table.tableNumber} | ${table.seats} kohta`}>
+                title={t('admin.tableTooltip', { number: table.tableNumber, seats: table.seats })}>
                 <span className="table-number">{table.tableNumber}</span>
                 <span className="table-seats">{table.seats}</span>
-                <button className="admin-delete-btn" onMouseDown={e => handleDeleteTable(e, table.id)} title="Kustuta laud">&times;</button>
+                <button className="admin-delete-btn" onMouseDown={e => handleDeleteTable(e, table.id)} title={t('admin.deleteTable')}>&times;</button>
               </div>
             );
           })}
@@ -657,12 +787,12 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
         {/* Room naming */}
         {namingRoom && (
           <div className="room-name-popup">
-            <label>Ruumi nimi:</label>
+            <label>{t('admin.roomName')}</label>
             <input autoFocus value={newRoomName} onChange={e => setNewRoomName(e.target.value)}
-              onKeyDown={e => e.key === 'Enter' && saveNewRoom()} placeholder="nt. VIP ruum" />
+              onKeyDown={e => e.key === 'Enter' && saveNewRoom()} placeholder={t('admin.roomPlaceholder')} />
             <div className="room-name-actions">
-              <button onClick={saveNewRoom} className="admin-tool-btn active">Salvesta</button>
-              <button onClick={() => { setNamingRoom(null); setTool('idle'); }} className="admin-tool-btn">T\u00fchista</button>
+              <button onClick={saveNewRoom} className="admin-tool-btn active">{t('admin.save')}</button>
+              <button onClick={() => { setNamingRoom(null); setTool('idle'); }} className="admin-tool-btn">{t('admin.cancel')}</button>
             </div>
           </div>
         )}
@@ -670,26 +800,24 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
         {/* Table edit panel */}
         {editingTable && (
           <div className="admin-edit-panel">
-            <h3>Laud #{editingTable.tableNumber}</h3>
+            <h3>{t('admin.tableNumber', { number: editingTable.tableNumber })}</h3>
             <div className="admin-edit-form">
-              <label>Kohti:<select value={editSeats} onChange={e => setEditSeats(+e.target.value)}>
+              <label>{t('admin.seatsLabel')}<select value={editSeats} onChange={e => setEditSeats(+e.target.value)}>
                 {[2, 4, 6, 8, 10].map(n => <option key={n} value={n}>{n}</option>)}
               </select></label>
-              <label>Tsoon:<select value={editZone} onChange={e => setEditZone(e.target.value as Zone)}>
-                <option value="MAIN_HALL">Sisesaal</option>
-                <option value="TERRACE">Terrass</option>
-                <option value="PRIVATE_ROOM">Privaatruum</option>
+              <label>{t('admin.zoneLabel')}<select value={editZone} onChange={e => setEditZone(e.target.value)}>
+                {rooms.map(r => <option key={r.id} value={r.name}>{r.name}</option>)}
               </select></label>
               <div className="admin-checkboxes">
-                <label><input type="checkbox" checked={editWindow} onChange={e => setEditWindow(e.target.checked)} /> Akna ääres</label>
-                <label><input type="checkbox" checked={editPrivate} onChange={e => setEditPrivate(e.target.checked)} /> Privaatne</label>
-                <label><input type="checkbox" checked={editPlayground} onChange={e => setEditPlayground(e.target.checked)} /> Mängunurk</label>
-                <label><input type="checkbox" checked={editAccessible} onChange={e => setEditAccessible(e.target.checked)} /> Ligipääsetav</label>
-                <label><input type="checkbox" checked={editStage} onChange={e => setEditStage(e.target.checked)} /> Lava lähedal</label>
+                <label><input type="checkbox" checked={editWindow} onChange={e => setEditWindow(e.target.checked)} /> {t('admin.windowSeat')}</label>
+                <label><input type="checkbox" checked={editPrivate} onChange={e => setEditPrivate(e.target.checked)} /> {t('admin.private')}</label>
+                <label><input type="checkbox" checked={editPlayground} onChange={e => setEditPlayground(e.target.checked)} /> {t('admin.playground')}</label>
+                <label><input type="checkbox" checked={editAccessible} onChange={e => setEditAccessible(e.target.checked)} /> {t('admin.accessible')}</label>
+                <label><input type="checkbox" checked={editStage} onChange={e => setEditStage(e.target.checked)} /> {t('admin.nearStage')}</label>
               </div>
               <div className="admin-edit-actions">
-                <button onClick={saveTableEdit} className="admin-tool-btn active">Salvesta</button>
-                <button onClick={() => setEditingTable(null)} className="admin-tool-btn">Sulge</button>
+                <button onClick={saveTableEdit} className="admin-tool-btn active">{t('admin.save')}</button>
+                <button onClick={() => setEditingTable(null)} className="admin-tool-btn">{t('admin.close')}</button>
               </div>
             </div>
           </div>
@@ -698,35 +826,36 @@ export default function AdminFloorPlan({ tables, floorElements, onTablesChange, 
         {/* Element edit panel */}
         {editingElement && (
           <div className="admin-edit-panel">
-            <h3>Element: {editingElement.type}</h3>
+            <h3>{t('admin.element', { type: editingElement.type })}</h3>
             <div className="admin-edit-form">
-              <label>Nimi:
+              <label>{t('admin.elemName')}
                 <input type="text" value={editElemName} onChange={e => setEditElemName(e.target.value)}
                   className="admin-edit-input" />
               </label>
-              <label>Laius (%):
+              <label>{t('admin.elemWidth')}
                 <input type="number" value={editElemWidth} onChange={e => setEditElemWidth(+e.target.value)}
                   min={1} max={100} step={0.5} className="admin-edit-input" />
               </label>
-              <label>Kõrgus (%):
+              <label>{t('admin.elemHeight')}
                 <input type="number" value={editElemHeight} onChange={e => setEditElemHeight(+e.target.value)}
                   min={1} max={100} step={0.5} className="admin-edit-input" />
               </label>
-              <label>Pöördenurk:
+              <label>{t('admin.elemRotation')}
                 <div className="admin-rotation-control">
                   <input type="range" min={0} max={360} value={editElemRotation}
                     onChange={e => setEditElemRotation(+e.target.value)} />
-                  <span className="admin-rotation-value">{editElemRotation}°</span>
+                  <span className="admin-rotation-value">{editElemRotation}&deg;</span>
                 </div>
               </label>
               <div className="admin-edit-actions">
-                <button onClick={saveElemEdit} className="admin-tool-btn active">Salvesta</button>
-                <button onClick={() => setEditingElement(null)} className="admin-tool-btn">Sulge</button>
+                <button onClick={saveElemEdit} className="admin-tool-btn active">{t('admin.save')}</button>
+                <button onClick={() => setEditingElement(null)} className="admin-tool-btn">{t('admin.close')}</button>
               </div>
             </div>
           </div>
         )}
       </div>
+
     </div>
   );
 }

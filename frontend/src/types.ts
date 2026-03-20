@@ -4,15 +4,13 @@ export interface RestaurantTable {
   seats: number;
   posX: number;
   posY: number;
-  zone: Zone;
+  zone: string;
   windowSeat: boolean;
   privateArea: boolean;
   nearPlayground: boolean;
   accessible: boolean;
   nearStage: boolean;
 }
-
-export type Zone = 'MAIN_HALL' | 'TERRACE' | 'PRIVATE_ROOM';
 
 export interface Reservation {
   id: number;
@@ -41,11 +39,21 @@ export interface FloorElement {
   rotation: number;
 }
 
+export interface Wall {
+  id: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
+  color: string;
+  thickness: number;
+}
+
 export interface Filters {
   date: string;
   time: string;
   partySize: number;
-  zone: Zone | '';
+  zone: string;
   windowSeat: boolean;
   privateArea: boolean;
   nearPlayground: boolean;

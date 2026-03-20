@@ -1,13 +1,16 @@
 import { useState } from 'react';
 import FloorPlan from './FloorPlan';
 import FloorPlan3D from './FloorPlan3D';
-import type { RestaurantTable, TableRecommendation, Reservation, FloorElement } from '../types';
+import type { RestaurantTable, TableRecommendation, Reservation, FloorElement, Wall } from '../types';
+import type { RoomDTO } from '../api';
 
 interface Props {
   tables: RestaurantTable[];
   recommendations: TableRecommendation[];
   reservations: Reservation[];
   floorElements: FloorElement[];
+  walls: Wall[];
+  rooms: RoomDTO[];
   selectedTable: RestaurantTable | null;
   filterDate: string;
   filterTime: string;
@@ -20,7 +23,7 @@ export default function FloorPlanWrapper(props: Props) {
   return (
     <div className="floor-plan-container">
       <div className="floor-plan-header">
-        <h2>Saali plaan</h2>
+        <h2></h2>
         <div className="view-toggle">
           <button
             className={`toggle-btn ${viewMode === '2d' ? 'active' : ''}`}
