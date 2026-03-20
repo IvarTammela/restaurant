@@ -3,7 +3,6 @@ package ee.ivar.tammela.restaurant.service;
 import ee.ivar.tammela.restaurant.dto.Preferences;
 import ee.ivar.tammela.restaurant.dto.TableRecommendation;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
-import ee.ivar.tammela.restaurant.model.Zone;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -33,7 +32,7 @@ class RecommendationServiceTest {
         void perfectSizeMatch() {
             RestaurantTable table = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
 
             double score = service.scoreTable(table, 2, noPrefs);
@@ -46,7 +45,7 @@ class RecommendationServiceTest {
         void extraSeatsPenalty() {
             RestaurantTable table = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(6)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
 
             double score = service.scoreTable(table, 2, noPrefs);
@@ -60,7 +59,7 @@ class RecommendationServiceTest {
         void tableTooSmall() {
             RestaurantTable table = RestaurantTable.builder()
                     .id(3L).tableNumber(3).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
 
             double score = service.scoreTable(table, 3, noPrefs);
@@ -73,7 +72,7 @@ class RecommendationServiceTest {
         void preferenceBonus() {
             RestaurantTable table = RestaurantTable.builder()
                     .id(4L).tableNumber(4).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .windowSeat(true).privateArea(true)
                     .build();
             Preferences prefs = new Preferences(true, true, false, false, false);
@@ -89,7 +88,7 @@ class RecommendationServiceTest {
         void accessibilityAlwaysAdds() {
             RestaurantTable table = RestaurantTable.builder()
                     .id(5L).tableNumber(5).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .accessible(true)
                     .build();
 
@@ -109,11 +108,11 @@ class RecommendationServiceTest {
         void sortedByScore() {
             RestaurantTable perfect = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(4)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
             RestaurantTable oversized = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(8)
-                    .posX(20).posY(20).zone(Zone.MAIN_HALL)
+                    .posX(20).posY(20).zone("Sisesaal")
                     .build();
 
             List<TableRecommendation> result = service.recommend(
@@ -129,11 +128,11 @@ class RecommendationServiceTest {
         void filtersSmallTables() {
             RestaurantTable small = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
             RestaurantTable big = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(6)
-                    .posX(20).posY(20).zone(Zone.MAIN_HALL)
+                    .posX(20).posY(20).zone("Sisesaal")
                     .build();
 
             List<TableRecommendation> result = service.recommend(
@@ -148,7 +147,7 @@ class RecommendationServiceTest {
         void emptyWhenNoFit() {
             RestaurantTable small = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(2)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
 
             List<TableRecommendation> result = service.recommend(
@@ -167,11 +166,11 @@ class RecommendationServiceTest {
         void adjacentTablesCombined() {
             RestaurantTable t1 = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(8)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
             RestaurantTable t2 = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(8)
-                    .posX(20).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(20).posY(10).zone("Sisesaal")
                     .build();
 
             // distance = 10, well under threshold of 35
@@ -191,11 +190,11 @@ class RecommendationServiceTest {
         void tooFarApartNotCombined() {
             RestaurantTable t1 = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(8)
-                    .posX(0).posY(0).zone(Zone.MAIN_HALL)
+                    .posX(0).posY(0).zone("Sisesaal")
                     .build();
             RestaurantTable t2 = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(8)
-                    .posX(50).posY(50).zone(Zone.MAIN_HALL)
+                    .posX(50).posY(50).zone("Sisesaal")
                     .build();
 
             // distance = sqrt(2500+2500) ~ 70.7, above threshold of 35
@@ -210,15 +209,15 @@ class RecommendationServiceTest {
         void deduplication() {
             RestaurantTable t1 = RestaurantTable.builder()
                     .id(1L).tableNumber(1).seats(6)
-                    .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(10).posY(10).zone("Sisesaal")
                     .build();
             RestaurantTable t2 = RestaurantTable.builder()
                     .id(2L).tableNumber(2).seats(6)
-                    .posX(15).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(15).posY(10).zone("Sisesaal")
                     .build();
             RestaurantTable t3 = RestaurantTable.builder()
                     .id(3L).tableNumber(3).seats(6)
-                    .posX(20).posY(10).zone(Zone.MAIN_HALL)
+                    .posX(20).posY(10).zone("Sisesaal")
                     .build();
 
             // All three are close; three possible pairs, but dedup should limit usage

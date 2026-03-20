@@ -1,7 +1,6 @@
 package ee.ivar.tammela.restaurant.controller;
 
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
-import ee.ivar.tammela.restaurant.model.Zone;
 import ee.ivar.tammela.restaurant.repository.ReservationRepository;
 import ee.ivar.tammela.restaurant.repository.TableRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,12 +34,12 @@ class TableControllerTest {
         tableRepository.deleteAll();
         tableRepository.save(RestaurantTable.builder()
                 .tableNumber(1).seats(4)
-                .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                .posX(10).posY(10).zone("Sisesaal")
                 .windowSeat(true).accessible(true)
                 .build());
         tableRepository.save(RestaurantTable.builder()
                 .tableNumber(2).seats(6)
-                .posX(20).posY(20).zone(Zone.TERRACE)
+                .posX(20).posY(20).zone("Terrass")
                 .privateArea(true)
                 .build());
     }

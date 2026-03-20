@@ -2,7 +2,6 @@ package ee.ivar.tammela.restaurant.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import ee.ivar.tammela.restaurant.model.RestaurantTable;
-import ee.ivar.tammela.restaurant.model.Zone;
 import ee.ivar.tammela.restaurant.repository.ReservationRepository;
 import ee.ivar.tammela.restaurant.repository.TableRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,7 +44,7 @@ class ReservationControllerTest {
         tableRepository.deleteAll();
         savedTable = tableRepository.save(RestaurantTable.builder()
                 .tableNumber(1).seats(4)
-                .posX(10).posY(10).zone(Zone.MAIN_HALL)
+                .posX(10).posY(10).zone("Sisesaal")
                 .build());
     }
 
